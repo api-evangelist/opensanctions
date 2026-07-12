@@ -23,10 +23,14 @@ apis:
       - type: Documentation
         url: https://www.opensanctions.org/docs/api/
 common:
+  - type: DomainSecurity
+    url: security/opensanctions-domain-security.yml
   - type: Website
     url: https://www.opensanctions.org/docs/api/
   - type: PublicAPIsListing
     url: https://github.com/public-apis/public-apis
+  - type: Blog
+    url: https://www.opensanctions.org/articles/rss/
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
