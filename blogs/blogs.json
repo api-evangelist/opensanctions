@@ -1,0 +1,21 @@
+{
+  "repo": "opensanctions",
+  "feeds": [
+    {
+      "source": "https://www.opensanctions.org/articles/rss/",
+      "feed_url": "https://www.opensanctions.org/articles/rss/",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
+    },
+    {
+      "source": "https://github.com/public-apis/public-apis",
+      "feed_url": "https://github.com/public-apis/public-apis",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    }
+  ],
+  "fetched": "2026-07-11T11:50:51Z",
+  "post_count": 15
+}
