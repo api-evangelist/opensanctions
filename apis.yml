@@ -1,48 +1,173 @@
 aid: opensanctions
-accessModel:
-  pricing: unknown
-  onboarding: unknown
-  trial: false
-  try_now: false
-  public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/opensanctions.png
 name: OpenSanctions
-description: "Data on international sanctions, crime and politically exposed persons"
+description: >-
+  OpenSanctions is an open database of international sanctions, watchlists, criminal
+  designations and politically exposed persons (PEPs), published as a screening API,
+  bulk data downloads and MIT-licensed open-source software from Berlin. It
+  consolidates hundreds of primary government sources — OFAC, the EU consolidated
+  list, UN Security Council, UK FCDO, procurement debarment registers, regulatory
+  enforcements and national PEP registers — into a single de-duplicated entity graph
+  expressed in the FollowTheMoney ontology it stewards. The hosted Screening API at
+  api.opensanctions.org offers query-by-example entity matching with scored,
+  per-feature explanations, free-text search, entity fetch with relationship
+  traversal, statement-level provenance for every asserted value, and an OpenRefine
+  reconciliation manifest. It is used for customer due diligence, transaction
+  monitoring, supply-chain and vessel screening, KYB, and investigative journalism.
+  The dataset is free for non-commercial use under CC BY-NC 4.0; commercial use is
+  licensed, and the API is metered at EUR 0.10 per query.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/opensanctions.png
 url: https://www.opensanctions.org/docs/api/
 specificationVersion: '0.23'
 created: '2026-05-28'
-modified: '2026-05-28'
+modified: '2026-08-27'
 x-source: public-apis/public-apis
 x-category: "Open Data"
 x-tier: 3
 x-tier-reason: bulk-registered-from-public-apis
+accessModel:
+  pricing: usage-based
+  onboarding: self-serve
+  trial: true
+  try_now: false
+  public: false
+  label: Self-serve signup with a 30-day trial
+  confidence: high
+  source:
+    - https://www.opensanctions.org/api/
+    - https://www.opensanctions.org/docs/api/authentication/
+    - https://www.opensanctions.org/docs/api/faq/
+  generated: '2026-08-27'
+  method: searched
 tags:
+  - Sanctions Screening
+  - Anti-Money Laundering
+  - Politically Exposed Persons
+  - Compliance
+  - Financial Crime
+  - Know Your Customer
+  - Entity Resolution
   - Open Data
+  - Risk Data
+  - Due Diligence
   - Public APIs
+  - agent-native
 apis:
-  - name: OpenSanctions
-    description: "Data on international sanctions, crime and politically exposed persons"
+  - name: OpenSanctions Screening API
+    description: >-
+      REST API for screening people, companies, vessels and other entities against
+      sanctions, watchlist and PEP data. Query-by-example matching returns scored
+      candidates with per-feature explanations; free-text search, entity fetch with
+      graph traversal, statement-level provenance and an OpenRefine reconciliation
+      manifest round out the surface. Authenticated with an
+      `Authorization: ApiKey <key>` header and metered per logical query.
     humanURL: https://www.opensanctions.org/docs/api/
-    baseURL: https://www.opensanctions.org/docs/api/
+    baseURL: https://api.opensanctions.org
     tags:
+      - Sanctions Screening
+      - Anti-Money Laundering
+      - Politically Exposed Persons
+      - Compliance
+      - Entity Resolution
       - Open Data
     properties:
+      - type: OpenAPI
+        url: openapi/opensanctions-api-openapi.yml
       - type: Documentation
         url: https://www.opensanctions.org/docs/api/
+      - type: APIReference
+        url: https://www.opensanctions.org/reference/
+      - type: Overlay
+        url: overlays/opensanctions-api-overlay.yaml
+      - type: ToolCrosswalk
+        url: mcp/opensanctions-tool-crosswalk.yml
+      - type: DataModel
+        url: data-model/opensanctions-data-model.yml
 common:
+  - type: AgenticAccess
+    url: agentic-access/opensanctions-agentic-access.yml
   - type: DomainSecurity
     url: security/opensanctions-domain-security.yml
   - type: Website
-    url: https://www.opensanctions.org/docs/api/
+    url: https://www.opensanctions.org/
   - type: PublicAPIsListing
     url: https://github.com/public-apis/public-apis
   - type: Blog
     url: https://www.opensanctions.org/articles/rss/
+  - type: DeveloperPortal
+    url: https://www.opensanctions.org/docs/api/
+  - type: Documentation
+    url: https://www.opensanctions.org/docs/
+  - type: APIReference
+    url: https://www.opensanctions.org/reference/
+  - type: GettingStarted
+    url: https://www.opensanctions.org/docs/api/quickstart/
+  - type: Support
+    url: https://www.opensanctions.org/support/
+  - type: HelpCenter
+    url: https://discuss.opensanctions.org/
+  - type: GitHubOrganization
+    url: https://github.com/opensanctions
+  - type: SourceCode
+    url: https://github.com/opensanctions/api-examples
+  - type: Pricing
+    url: https://www.opensanctions.org/api/
+  - type: SignUp
+    url: https://www.opensanctions.org/api/
+  - type: Login
+    url: https://www.opensanctions.org/account/
+  - type: TermsOfService
+    url: https://www.opensanctions.org/docs/terms/
+  - type: PrivacyPolicy
+    url: https://www.opensanctions.org/docs/privacy/
+  - type: Security
+    url: https://www.opensanctions.org/docs/security/
+  - type: VulnerabilityDisclosure
+    url: security/opensanctions-vulnerability-disclosure.yml
+  - type: TrustCenter
+    url: security/opensanctions-trust-center.yml
+  - type: Compliance
+    url: https://www.opensanctions.org/docs/security/
+  - type: Conformance
+    url: conformance/opensanctions-conformance.yml
+  - type: StatusPage
+    url: https://status.opensanctions.org/
+  - type: Deprecation
+    url: https://www.opensanctions.org/docs/data/changes/
+  - type: Lifecycle
+    url: lifecycle/opensanctions-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/opensanctions-changelog.yml
+  - type: Authentication
+    url: authentication/opensanctions-authentication.yml
+  - type: ErrorCatalog
+    url: errors/opensanctions-problem-types.yml
+  - type: Conventions
+    url: conventions/opensanctions-conventions.yml
+  - type: RateLimits
+    url: rate-limits/opensanctions-rate-limits.yml
+  - type: Plans
+    url: plans/opensanctions-plans-pricing.yml
+  - type: Packages
+    url: packages/opensanctions-packages.yml
+  - type: SDKs
+    url: packages/opensanctions-packages.yml
+  - type: CLI
+    url: cli/opensanctions-cli.yml
+  - type: Sandbox
+    url: sandbox/opensanctions-sandbox.yml
+  - type: MCPServer
+    url: mcp/opensanctions-mcp.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: LLMsTxt
+    url: llms/opensanctions-llms.txt
+  - type: DataModel
+    url: data-model/opensanctions-data-model.yml
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-27'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v1
