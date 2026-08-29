@@ -15,6 +15,17 @@ description: >-
   monitoring, supply-chain and vessel screening, KYB, and investigative journalism.
   The dataset is free for non-commercial use under CC BY-NC 4.0; commercial use is
   licensed, and the API is metered at EUR 0.10 per query.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/opensanctions.png
 url: https://www.opensanctions.org/docs/api/
 specificationVersion: '0.23'
