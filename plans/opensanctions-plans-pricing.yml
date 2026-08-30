@@ -1,0 +1,75 @@
+generated: '2026-08-27'
+method: searched
+source: https://www.opensanctions.org/api/
+docs:
+  - https://www.opensanctions.org/api/
+  - https://www.opensanctions.org/licensing/
+  - https://www.opensanctions.org/docs/api/faq/#metering
+  - https://www.opensanctions.org/docs/commercial/faq/
+plan_count: 4
+currency: EUR
+model: usage-based
+note: >-
+  OpenSanctions publishes a real unit price rather than hiding behind "contact us":
+  EUR 0.10 per query on the Screening API, pay-as-you-go, with a 30-day
+  complimentary trial for business-email registrations. The bulk-data and
+  reseller/OEM licences are quoted, not listed. The dataset itself is free for
+  non-commercial use under CC BY-NC 4.0, which is a genuine free tier rather than a
+  marketing one — journalism, civil society and academia can also request free API
+  keys.
+plans:
+  - name: Screening API (pay-as-you-go)
+    price: 0.10
+    currency: EUR
+    unit: per query
+    billing_period: usage-based
+    included_quota: null
+    overage: n/a — every query billed at the unit rate
+    limits:
+      - A default per-key monthly request ceiling applies; 429 until the next month.
+      - Up to 100 queries per /match request.
+      - "/entities and /statements are not billed."
+    signup: https://www.opensanctions.org/account/
+    source: https://www.opensanctions.org/api/
+  - name: 30-day trial
+    price: 0
+    currency: EUR
+    billing_period: 30 days
+    included_quota: >-
+      A default trial key quota applies (numeric value not published); exceeding it
+      returns 429 until the next month.
+    requirements: registration with a business email address
+    source: https://www.opensanctions.org/api/
+  - name: Non-commercial / public-interest use
+    price: 0
+    currency: EUR
+    billing_period: null
+    included_quota: null
+    terms: >-
+      The dataset is free for non-commercial users under CC BY-NC 4.0. Free API keys
+      are offered for public-interest work — journalism, civil society, academia —
+      on request to support.
+    source:
+      - https://www.opensanctions.org/docs/api/authentication/
+      - https://www.opensanctions.org/licensing/
+  - name: Bulk data licence / Reseller-OEM / On-premise
+    price: null
+    currency: EUR
+    billing_period: annual contract
+    included_quota: null
+    terms: >-
+      Quoted, not listed — "Talk to sales". Covers the bulk data licence
+      (/licensing/screening/), the reseller/OEM embed licence
+      (/licensing/reseller/) and self-hosted yente deployments (/docs/on-premise/).
+    source: https://www.opensanctions.org/licensing/
+billing:
+  processor: Stripe
+  note: >-
+    Billing migrated from Chargebee to Stripe on 2025-11-13
+    (https://www.opensanctions.org/changelog/37/).
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://www.opensanctions.org/api/', status: 200}
+    - {url: 'https://www.opensanctions.org/licensing/', status: 200}
+    - {url: 'https://www.opensanctions.org/docs/api/faq/', status: 200}

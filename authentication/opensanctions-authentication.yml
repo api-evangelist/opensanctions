@@ -1,0 +1,67 @@
+generated: '2026-08-27'
+method: searched
+source: openapi/opensanctions-api-openapi.yml
+docs: https://www.opensanctions.org/docs/api/authentication/
+note: >-
+  DERIVE returned nothing: the published OpenAPI declares an EMPTY
+  components.securitySchemes and no top-level `security` requirement, even though
+  every data endpoint requires a key. This profile is therefore SEARCHED from the
+  provider's own authentication docs and confirmed by a live unauthenticated probe.
+  The missing securityScheme is the single largest contract-quality gap in this
+  provider's spec and is captured as a recommendation in
+  overlays/opensanctions-api-overlay.yaml.
+summary:
+  types: [apiKey]
+  api_key_in: [header]
+  oauth2_flows: []
+  spec_declared: false
+  docs_declared: true
+schemes:
+  - name: ApiKeyAuth
+    type: apiKey
+    in: header
+    parameter_name: Authorization
+    value_format: "ApiKey <key>"
+    example_header: "Authorization: ApiKey xxxxxxxxxxxxxxxxxxxxxxxx"
+    sources: [https://www.opensanctions.org/docs/api/authentication/]
+    note: >-
+      A custom scheme, not RFC 6750 Bearer: the Authorization header carries the
+      literal prefix `ApiKey`, not `Bearer`. The yente-mcp MCP server is the one
+      exception — it accepts `Authorization: Bearer <key>` from the MCP client and
+      translates it before forwarding.
+key_management:
+  issue_url: https://www.opensanctions.org/api/
+  account_url: https://www.opensanctions.org/account/
+  env_var: OPENSANCTIONS_API_KEY
+  trial: 30-day complimentary trial on registration with a business email address
+  free_keys: >-
+    Free keys are offered for public-interest work — journalism, civil society and
+    academia — by contacting support.
+  rotation_policy: not documented
+unauthenticated_surface:
+  - operation: healthz_healthz_get
+    path: /healthz
+    probed_status: 200
+  - operation: catalog_catalog_get
+    path: /catalog
+    probed_status: 200
+  - operation: readyz_readyz_get
+    path: /readyz
+    probed_status: not-probed
+self_hosted:
+  product: yente
+  docs: https://www.opensanctions.org/docs/on-premise/
+  note: >-
+    A self-hosted yente instance needs no API key at all (the SDK's `base_url=`
+    kwarg targets it with `api_key` unset). POST /updatez is the one write
+    operation and is guarded separately, returning 403 "Authorization error."
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - url: https://www.opensanctions.org/docs/api/authentication/
+      status: 200
+    - url: https://api.opensanctions.org/search/default?q=test
+      status: 401
+      body: '{"detail":"No API key provided."}'
+    - url: https://api.opensanctions.org/healthz
+      status: 200

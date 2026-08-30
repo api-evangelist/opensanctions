@@ -1,0 +1,65 @@
+generated: '2026-08-27'
+method: searched
+source: https://www.opensanctions.org/docs/api/faq/
+docs: https://www.opensanctions.org/docs/api/faq/#metering
+limit_count: 3
+headers: []
+status_on_exhaustion: 429
+retry_after: false
+note: >-
+  OpenSanctions meters by MONTHLY QUERY QUOTA, not by a per-second or per-minute
+  rate. There is no published requests-per-second or concurrency ceiling, and — the
+  finding that matters for an agent — NO runtime signal at all: live responses
+  carry no X-RateLimit-*, no RateLimit-* (RFC 9239 style), and no Retry-After.
+  A client cannot see how close it is to the ceiling; it discovers exhaustion by
+  being 429'd, and the 429 then persists until the first of the next month rather
+  than clearing after a backoff window. Billing is per LOGICAL QUERY, not per HTTP
+  request, so one /match call carrying 100 entities consumes 100 units of quota.
+limits:
+  - scope: per-key
+    window: calendar-month
+    limit: >-
+      A default per-key monthly request ceiling applies to both trial and paid keys;
+      the numeric value is set per key and is not published.
+    burst: null
+    status: 429
+    reset: beginning of the next calendar month
+    source: https://www.opensanctions.org/docs/api/faq/
+  - scope: per-account
+    window: month
+    limit: 2,000,000 queries
+    kind: soft-threshold
+    note: >-
+      Volumes "likely to exceed 2 million queries per month" require contacting
+      OpenSanctions so they can verify the traffic is legitimate. Not an enforced
+      rate limit — a stated escalation threshold.
+    source: https://www.opensanctions.org/docs/api/faq/
+  - scope: per-account
+    window: hour
+    limit: 200,000 requests
+    kind: soft-threshold
+    note: >-
+      Same escalation clause: "more than 200,000 requests per hour" should be
+      cleared with OpenSanctions in advance.
+    source: https://www.opensanctions.org/docs/api/faq/
+metering:
+  unit: logical query
+  billed_operations:
+    - {operation: match_match__dataset__post, cost: "EUR 0.10 x queries in the request"}
+    - {operation: reconcile_reconcile__dataset__get, cost: "EUR 0.10 x queries in the request"}
+    - {operation: search_search__dataset__get, cost: "EUR 0.10 per request"}
+  free_operations:
+    - {operation: fetch_entity_entities__entity_id__get, cost: free}
+    - {operation: statements_statements_get, cost: free}
+  batch_size: >-
+    A single /match request may bundle up to 100 queries — one per entity being
+    screened — and each query in the batch is billed individually.
+  failed_requests: >-
+    "Non-successful calls, whether caused by client or server errors, are always
+    free" — only 2xx responses are metered.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://www.opensanctions.org/docs/api/faq/', status: 200}
+    - {url: 'https://api.opensanctions.org/healthz', status: 200, note: no rate-limit response headers}
+    - {url: 'https://api.opensanctions.org/catalog', status: 200, note: no rate-limit response headers}

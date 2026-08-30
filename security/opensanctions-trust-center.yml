@@ -1,0 +1,42 @@
+generated: '2026-08-27'
+method: searched
+probe: true
+url: https://trust.opensanctions.org/
+vendor: Vanta
+certifications:
+  - ISO/IEC 27001:2022
+auditor: Consilium Labs
+evidence:
+  - source: https://trust.opensanctions.org/
+    status: 200
+    keywords: [trust center]
+    note: >-
+      Confirmed to be a Vanta-hosted trust center from the asset host
+      (assets.vanta.com) in the served HTML. The page renders client-side: the
+      HTML body contains 28 characters of text ("OpenSanctions Trust Center") and
+      nothing else, so no certification, sub-processor or control list is readable
+      without executing JavaScript.
+  - source: https://www.opensanctions.org/docs/security/
+    status: 200
+    keywords: [ISO/IEC 27001:2022, Consilium Labs, security@opensanctions.org]
+    note: >-
+      The certification claim is taken from this server-rendered page rather than
+      the trust center, and names the certifying body.
+linked_from:
+  - https://www.opensanctions.org/docs/opensource/ (footer, "Trust Center")
+  - https://www.opensanctions.org/llms.txt ("Vendor information")
+not_found:
+  - SOC 2
+  - PCI DSS
+  - HIPAA
+  - FedRAMP
+  - CSA STAR
+  - published sub-processor list
+note: >-
+  Absence above means "not readable on the surfaces probed", not "does not exist" —
+  the Vanta portal may list more behind its JS render.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://trust.opensanctions.org/', status: 200}
+    - {url: 'https://www.opensanctions.org/docs/security/', status: 200}

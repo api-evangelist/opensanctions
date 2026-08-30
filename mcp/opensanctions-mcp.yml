@@ -1,0 +1,131 @@
+generated: '2026-08-27'
+method: searched
+status: published
+source: >-
+  https://yenteclient.followthemoney.tech/mcp/ and
+  https://raw.githubusercontent.com/opensanctions/yente-client/refs/heads/main/python/docs/mcp.md
+  (HTTP 200, fetched 2026-08-27); announced in
+  https://www.opensanctions.org/llms.txt and
+  https://www.opensanctions.org/docs/opensource/
+deployment:
+  mode: local-stdio
+  endpoint: null
+  install: "pip install 'yente-client[mcp]' && yente-mcp"
+  package: https://pypi.org/project/yente-client/
+  auth: api-key
+  verified: searched
+  note: >-
+    OpenSanctions publishes NO hosted/remote MCP endpoint. `yente-mcp` ships as an
+    extra of the first-party `yente-client` PyPI package and a human must install and
+    run it before any agent can reach it. It speaks streamable HTTP by default but
+    binds 127.0.0.1:8000 (endpoint http://127.0.0.1:8000/mcp), which is a local
+    process, not an agent-reachable URL; `--transport stdio` is also supported. No
+    endpoint URL is recorded here because none is published.
+server:
+  name: yente
+  transport: [http-streamable-local, stdio]
+  local_endpoint: http://127.0.0.1:8000/mcp
+  default_bind: 127.0.0.1:8000
+  upstream_base_url: https://api.opensanctions.org
+  upstream_env_var: YENTE_BASE_URL
+  configuration:
+    - flag: --transport
+      env: YENTE_MCP_TRANSPORT
+      default: http
+      values: [http, stdio]
+    - flag: --host
+      env: YENTE_MCP_HOST
+      default: 127.0.0.1
+    - flag: --port
+      env: YENTE_MCP_PORT
+      default: '8000'
+    - flag: null
+      env: OPENSANCTIONS_API_KEY
+      default: unset
+      note: Fallback key used when a request carries no bearer token.
+    - flag: null
+      env: YENTE_MCP_NAME
+      note: Overrides the server name advertised to MCP clients (self-hosted branding).
+    - flag: null
+      env: YENTE_MCP_INSTRUCTIONS
+      note: Overrides the instructions advertised to MCP clients.
+authentication:
+  model: pass-through-bearer
+  header: "Authorization: Bearer <OpenSanctions API key>"
+  note: >-
+    The server holds no secret of its own — each MCP request carries the caller's
+    own OpenSanctions API key and the server forwards it downstream, so validation,
+    quota and billing happen at the API gateway and the caller screens as themselves.
+    Against an open self-hosted yente no key is needed.
+client_setup:
+  claude_code: >-
+    claude mcp add --transport http yente http://127.0.0.1:8000/mcp
+    --header "Authorization: Bearer $OPENSANCTIONS_API_KEY"
+maturity:
+  stability: new
+  provider_note: >-
+    Verbatim from the provider's docs: "The MCP server is new; tool response shapes
+    may still change between releases."
+tools:
+  - name: match_entity
+    category: screening
+    description: >-
+      Screen one entity, query-by-example; returns scored candidates. Use for any
+      matching task, even with partial input.
+    source_operation: openapi/opensanctions-api-openapi.yml#match_match__dataset__post
+  - name: search_entities
+    category: screening
+    description: Free-text search for end-user search UIs; returns unscored entities.
+    source_operation: openapi/opensanctions-api-openapi.yml#search_search__dataset__get
+  - name: fetch_entity_by_id
+    category: investigation
+    description: One entity's full record, by OpenSanctions ID.
+    source_operation: openapi/opensanctions-api-openapi.yml#fetch_entity_entities__entity_id__get
+  - name: fetch_entity_relations
+    category: investigation
+    description: Walk sanctions, ownership, and family edges, paginated.
+    source_operation: openapi/opensanctions-api-openapi.yml#Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+  - name: fetch_entity_statements
+    category: investigation
+    description: >-
+      Statement-level provenance: which source asserted a value (hosted API only).
+    source_operation: openapi/opensanctions-api-openapi.yml#statements_statements_get
+  - name: describe_schema
+    category: vocabulary
+    description: FtM schemata and their properties (offline, bundled model).
+    source_operation: null
+  - name: describe_topics
+    category: vocabulary
+    description: The risk-topic vocabulary (offline).
+    source_operation: null
+  - name: describe_countries
+    category: vocabulary
+    description: The country vocabulary (offline).
+    source_operation: null
+  - name: describe_dataset
+    category: metadata
+    description: Dataset metadata from the live catalog.
+    source_operation: openapi/opensanctions-api-openapi.yml#catalog_catalog_get
+  - name: describe_program
+    category: metadata
+    description: Sanctions-program metadata behind programId codes.
+    source_operation: null
+deliberate_omissions:
+  - capability: matching algorithm selection
+    reason: >-
+      Provider states algorithm choice is "a tuning decision below the assistant's
+      altitude"; the server default applies. The /algorithms operation and the
+      ?algorithm= query parameter remain available via the REST API, SDK and CLI.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - url: https://yenteclient.followthemoney.tech/mcp/
+      status: 200
+    - url: https://raw.githubusercontent.com/opensanctions/yente-client/refs/heads/main/python/docs/mcp.md
+      status: 200
+    - url: https://pypi.org/pypi/yente-client/json
+      status: 200
+  tools_list_probe: >-
+    not attempted — there is no hosted endpoint to POST tools/list to. The tool
+    names and descriptions above are the provider's own published list, verbatim;
+    input schemas would require running yente-mcp locally and introspecting it.

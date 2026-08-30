@@ -1,0 +1,109 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/opensanctions-api-openapi.yml
+docs:
+  - https://www.opensanctions.org/reference/
+  - https://www.opensanctions.org/docs/entities/
+  - https://www.opensanctions.org/docs/nested-entities/
+  - https://www.opensanctions.org/docs/identifiers/
+  - https://www.opensanctions.org/docs/statements/
+  - https://followthemoney.tech/
+ontology:
+  name: FollowTheMoney (FtM)
+  steward: OpenSanctions
+  note: >-
+    The API's data model is NOT closed inside the OpenAPI. `EntityResponse.schema`
+    names an FtM schema (Person, Company, Organization, Vessel, Address, Sanction,
+    Ownership, Directorship, ...) and `properties` is an open map whose keys are that
+    schema's FtM properties. The 42 component schemas in the spec describe the
+    ENVELOPE; the entity vocabulary itself lives in the FtM model, published
+    separately at followthemoney.tech and bundled into the client SDKs. An agent that
+    reads only the OpenAPI will not know what properties exist — it must also read
+    the FtM model (or call the MCP `describe_schema` tool).
+entities:
+  - name: Entity
+    schema: EntityResponse
+    id_field: id
+    id_format: >-
+      Namespaced string, e.g. NK-aU5ybkbRFJucf8YMwsJvDw. IDs are stable but
+      MERGEABLE — a de-duplicated entity 308-redirects to its canonical ID.
+    fields: [id, caption, schema, properties, datasets, referents, target, first_seen, last_seen, last_change]
+    note: >-
+      `referents` holds the IDs that were merged into this entity; `target` marks
+      whether the entity is itself a screening target rather than context.
+  - name: ScoredEntity
+    schema: ScoredEntityResponse
+    extends: EntityResponse
+    fields: [score, explanations, match]
+    note: The /match result form — an Entity plus its score, per-feature explanations and a boolean match verdict.
+  - name: Statement
+    schema: Statement
+    id_field: id
+    fields: [id, entity_id, canonical_id, prop, prop_type, schema, value, original_value, dataset, lang, origin, first_seen, last_seen]
+    note: >-
+      The provenance atom: one asserted property value, tied to the dataset and
+      origin that asserted it. `entity_id` is the source ID, `canonical_id` the
+      post-de-duplication ID — the pair is what makes the merge graph auditable.
+  - name: Dataset
+    schema: YenteDatasetModel
+    id_field: name
+    fields: [name, title, license, summary, description, url, updated_at, last_export, entity_count, thing_count, version, category, tags, publisher, coverage, resources, children, deprecation, deprecated, load, entities_url, delta_url, namespace, index_version, index_current]
+    note: >-
+      477 datasets in the live catalog (probed 2026-08-27). `children` makes
+      collections (e.g. `default`, `sanctions`) composites of source datasets.
+      `deprecation`/`deprecated` carry the change policy into the data itself.
+  - name: DataPublisher
+    schema: DataPublisher
+    fields: [name, url, name_en, acronym, description, country, official, logo_url, country_label]
+  - name: DataResource
+    schema: DataResource
+    fields: [name, url, checksum, timestamp, mime_type, title, size, mime_type_label]
+  - name: DataCoverage
+    schema: DataCoverage
+    fields: [start, end, countries, frequency, schedule]
+  - name: Algorithm
+    schema: Algorithm
+    id_field: name
+    fields: [name, description, features, docs]
+  - name: FeatureResult
+    schema: FeatureResult
+    fields: [detail, score, query, candidate]
+    note: The per-feature explanation behind a match score — the audit trail a compliance reviewer needs.
+  - name: EntityExample
+    schema: EntityExample
+    fields: [id, schema, properties]
+    note: The query-by-example input shape submitted to /match.
+relationships:
+  - {from: EntityResponse, to: EntityResponse, kind: has_many, via: properties, note: 'FtM properties of type "entity" (sanctions, ownershipOwner, familyPerson, addressEntity, ...) reference other entities by ID; nested=true inlines them.'}
+  - {from: EntityResponse, to: EntityResponse, kind: has_many, via: referents, note: 'IDs merged into this canonical entity.'}
+  - {from: EntityResponse, to: YenteDatasetModel, kind: has_many, via: datasets}
+  - {from: ScoredEntityResponse, to: EntityResponse, kind: extends, via: null}
+  - {from: ScoredEntityResponse, to: FeatureResult, kind: has_many, via: explanations}
+  - {from: EntityAdjacentResponse, to: EntityResponse, kind: has_one, via: entity}
+  - {from: EntityAdjacentResponse, to: AdjacentResultsResponse, kind: has_many, via: adjacent, note: 'Keyed by FtM property name — the per-property page of adjacent entities.'}
+  - {from: AdjacentResultsResponse, to: EntityResponse, kind: has_many, via: results}
+  - {from: AdjacentResultsResponse, to: TotalSpec, kind: has_one, via: total}
+  - {from: SearchResponse, to: EntityResponse, kind: has_many, via: results}
+  - {from: SearchResponse, to: SearchFacet, kind: has_many, via: facets}
+  - {from: SearchFacet, to: SearchFacetItem, kind: has_many, via: values}
+  - {from: EntityMatchResponse, to: EntityMatches, kind: has_many, via: responses, note: 'Keyed by the caller-chosen query name, so a batch of 100 correlates client-side.'}
+  - {from: EntityMatches, to: ScoredEntityResponse, kind: has_many, via: results}
+  - {from: EntityMatches, to: EntityExample, kind: has_one, via: query}
+  - {from: EntityMatchQuery, to: EntityExample, kind: has_many, via: queries}
+  - {from: Statement, to: EntityResponse, kind: belongs_to, via: canonical_id}
+  - {from: Statement, to: EntityResponse, kind: belongs_to, via: entity_id, note: 'Pre-merge source entity.'}
+  - {from: Statement, to: YenteDatasetModel, kind: belongs_to, via: dataset}
+  - {from: DataCatalogModel, to: YenteDatasetModel, kind: has_many, via: datasets}
+  - {from: YenteDatasetModel, to: YenteDatasetModel, kind: has_many, via: children, note: 'Collections compose source datasets.'}
+  - {from: YenteDatasetModel, to: DataPublisher, kind: has_one, via: publisher}
+  - {from: YenteDatasetModel, to: DataResource, kind: has_many, via: resources}
+  - {from: YenteDatasetModel, to: DataCoverage, kind: has_one, via: coverage}
+  - {from: AlgorithmResponse, to: Algorithm, kind: has_many, via: algorithms}
+id_conventions:
+  - {prefix: 'NK-', meaning: 'OpenSanctions canonical entity ID (nomenklatura-assigned)'}
+  - {prefix: 'Q', meaning: 'Wikidata QID, used verbatim where an entity resolves to Wikidata'}
+  - {note: 'Source datasets contribute their own prefixed IDs (e.g. ofac-<n>, eu-fsf-<n>); /docs/identifiers/ is the reference.'}
+counts:
+  component_schemas: 42
+  operations: 12
+  live_datasets: 477

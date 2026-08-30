@@ -1,0 +1,112 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the OpenSanctions API
+  version: 1.0.0
+extends: openapi/opensanctions-api-openapi.yml
+x-provenance:
+  generated: '2026-08-27'
+  method: generated
+  source: >-
+    Derived from the harvested contract at
+    openapi/_original/opensanctions-openapi.json plus the provider's own
+    documentation. Every value below is sourced from an OpenSanctions page or a live
+    probe — nothing here is invented. The overlay is NOT applied to the harvested
+    spec; it records the gap between what the API does and what its contract says.
+actions:
+  - target: $.info
+    description: Record the API Evangelist provenance stamp.
+    update:
+      x-apievangelist-slug: opensanctions
+      x-apievangelist-harvested: '2026-08-27'
+      x-apievangelist-source: https://api.opensanctions.org/openapi.json
+
+  - target: $
+    description: >-
+      GAP — the published spec declares no servers[]. The base URL is stated at
+      https://www.opensanctions.org/docs/api/authentication/ and is the yente-client
+      SDK's default base_url.
+    update:
+      servers:
+        - url: https://api.opensanctions.org
+          description: OpenSanctions hosted screening API
+        - url: http://localhost:8000
+          description: Self-hosted yente instance (https://yente.followthemoney.tech/)
+
+  - target: $.components.securitySchemes
+    description: >-
+      GAP, and the largest one in this contract — components.securitySchemes is
+      EMPTY, yet every data endpoint requires a key and returns 401 without one
+      (probed: GET /search/default -> 401 {"detail":"No API key provided."}). Any
+      generated client is therefore born unable to authenticate. The scheme below is
+      transcribed from the provider's authentication docs.
+    update:
+      ApiKeyAuth:
+        type: apiKey
+        in: header
+        name: Authorization
+        description: >-
+          OpenSanctions API key, sent with the literal prefix `ApiKey` — e.g.
+          `Authorization: ApiKey xxxxxxxxxxxxxxxxxxxxxxxx`. This is NOT RFC 6750
+          Bearer. Keys are issued at https://www.opensanctions.org/api/ .
+          Not required against a self-hosted yente instance.
+
+  - target: $.paths['/search/{dataset}'].get
+    description: >-
+      GAP — the 401 returned to unauthenticated callers is not declared. Adding it
+      documented here rather than mutating the harvested spec.
+    update:
+      x-apievangelist-undeclared-responses:
+        '401':
+          description: No API key provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: >-
+            Monthly query quota exceeded; rejected until the beginning of the next
+            calendar month (https://www.opensanctions.org/docs/api/faq/#metering).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  - target: $.paths['/match/{dataset}'].post
+    description: Record the published unit price and batch ceiling on the billed operation.
+    update:
+      x-apievangelist-metering:
+        unit: logical query
+        price_eur: 0.10
+        batch_max: 100
+        billed_on: 2xx only
+        source: https://www.opensanctions.org/docs/api/faq/#metering
+
+  - target: $.paths['/reconcile/{dataset}'].get
+    description: >-
+      Flag the domain-standard signature — this operation returns a Reconciliation
+      Service API manifest (W3C Entity Reconciliation CG / OpenRefine lineage), which
+      is the interoperability contract that lets reconciliation-aware clients
+      integrate with no bespoke connector.
+    update:
+      x-apievangelist-domain-standard:
+        id: reconciliation-service-api
+        evidence: '#/components/schemas/FreebaseManifest'
+
+  - target: $.components.schemas.EntityResponse
+    description: >-
+      Record that `properties` is an OPEN map keyed by FollowTheMoney property names
+      for the schema named in `schema` — the vocabulary is external to this document
+      and lives at https://followthemoney.tech/ .
+    update:
+      x-apievangelist-external-vocabulary:
+        ontology: FollowTheMoney
+        reference: https://www.opensanctions.org/reference/
+        model: https://followthemoney.tech/explorer/
+
+  - target: $.components.schemas.TotalSpec
+    description: >-
+      Warn that `total` is {value, relation} and not an integer — relation
+      distinguishes an exact count from a lower bound.
+    update:
+      x-apievangelist-note: >-
+        Clients that treat `total` as a number will mis-page deep result sets.

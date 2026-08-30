@@ -1,0 +1,117 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  mcp/opensanctions-mcp.yml (provider-published tool list) bound to
+  openapi/opensanctions-api-openapi.yml (OpenAPI 3.1.0 harvested from
+  https://api.opensanctions.org/openapi.json)
+note: >-
+  The MCP server is a thin first-party wrapper over the same REST surface, so most
+  tools bind 1:1 to an operationId. Input schemas were NOT read from a live
+  tools/list — no hosted endpoint exists — so each tool's real input contract is the
+  bound operation's parameters/requestBody in the OpenAPI, and confidence is set
+  from name+description semantics.
+surfaces:
+  openapi:
+    file: openapi/opensanctions-api-openapi.yml
+    source_url: https://api.opensanctions.org/openapi.json
+    gated: false
+    operations: 12
+  mcp:
+    file: mcp/opensanctions-mcp.yml
+    url: null
+    deployment: local-stdio
+    gated: true
+    note: >-
+      tools/list could not be probed: the server is not hosted. Tool names and
+      descriptions are the provider's published list.
+  graphql:
+    endpoint: null
+    note: OpenSanctions publishes no GraphQL surface.
+crosswalk:
+  - tool: match_entity
+    category: screening
+    rest: [match_match__dataset__post]
+    binding: rest
+    confidence: high
+    note: >-
+      POST /match/{dataset}. Real inputSchema = the dataset path param, the
+      limit/threshold/algorithm/topics query params, and the EntityMatchQuery
+      requestBody (up to 100 queries per request).
+  - tool: search_entities
+    category: screening
+    rest: [search_search__dataset__get]
+    binding: rest
+    confidence: high
+    note: GET /search/{dataset}; inherits q/schema/countries/topics/datasets/limit/offset.
+  - tool: fetch_entity_by_id
+    category: investigation
+    rest: [fetch_entity_entities__entity_id__get]
+    binding: rest
+    confidence: high
+    note: GET /entities/{entity_id}; 308 redirect when the entity was merged into another ID.
+  - tool: fetch_entity_relations
+    category: investigation
+    rest:
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+    binding: rest
+    confidence: medium
+    note: >-
+      Fans out to two operations. "Walk sanctions, ownership, and family edges,
+      paginated" matches /entities/{id}/adjacent, and the per-property variant
+      /entities/{id}/adjacent/{property_name} is the narrowed form; the tool
+      description does not say which it calls, hence medium.
+  - tool: fetch_entity_statements
+    category: investigation
+    rest: [statements_statements_get]
+    binding: rest
+    confidence: high
+    note: >-
+      GET /statements. Tool description says "hosted API only", which matches the
+      spec — the statements endpoint is not available on self-hosted yente.
+  - tool: describe_dataset
+    category: metadata
+    rest: [catalog_catalog_get]
+    binding: rest
+    confidence: high
+    note: GET /catalog returns the DataCatalogModel the tool reads dataset metadata from.
+mcp_only:
+  - tool: describe_schema
+    reason: >-
+      Served from the FtM model bundled into the client package (offline). No REST
+      operation exposes the data dictionary; the equivalent human surface is
+      https://www.opensanctions.org/reference/ .
+  - tool: describe_topics
+    reason: Offline lookup against the bundled FtM Topic vocabulary; no REST operation.
+  - tool: describe_countries
+    reason: Offline lookup against the bundled FtM country vocabulary; no REST operation.
+  - tool: describe_program
+    reason: >-
+      Sanctions-program metadata behind programId codes. The published OpenAPI has
+      no /programs operation, though the SDK exposes c.programs() — a real REST/MCP
+      divergence against the spec, not an invented tool.
+rest_only:
+  - capability: reconciliation
+    operations: [reconcile_reconcile__dataset__get]
+    note: >-
+      W3C/OpenRefine Reconciliation Service API manifest at /reconcile/{dataset}.
+      Deliberately absent from the tool set — it targets OpenRefine, not agents.
+  - capability: matching-algorithm introspection
+    operations: [algorithms_algorithms_get]
+    note: >-
+      Provider states algorithm choice is intentionally not exposed to assistants.
+  - capability: service health
+    operations: [healthz_healthz_get, readyz_readyz_get]
+    note: Liveness/readiness probes; operational, not agent-facing.
+  - capability: index administration
+    operations: [force_update_updatez_post]
+    note: >-
+      POST /updatez forces an index update; guarded by a token and only meaningful
+      on a self-hosted yente instance (403 Authorization error otherwise).
+coverage:
+  tools_named: 10
+  tools_bound_to_rest: 6
+  mcp_only: 4
+  rest_operations_total: 12
+  rest_operations_with_tool: 7
+  rest_only_operations: 5
