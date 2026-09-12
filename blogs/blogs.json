@@ -2,23 +2,21 @@
   "repo": "opensanctions",
   "feeds": [
     {
-      "source": "https://www.opensanctions.org/articles/rss/",
-      "feed_url": "https://www.opensanctions.org/articles/rss/",
-      "title": "",
-      "saved": 0,
-      "method": "feed",
-      "nature": "undetermined",
-      "nature_basis": null
-    },
-    {
       "source": "https://github.com/public-apis/public-apis",
       "feed_url": "https://github.com/public-apis/public-apis",
       "title": "",
       "saved": 0,
       "method": "none"
+    },
+    {
+      "source": "https://www.opensanctions.org/articles/rss/",
+      "feed_url": "https://www.opensanctions.org/articles/rss/",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
     }
   ],
-  "fetched": "2026-08-30T22:33:40Z",
+  "fetched": "2026-09-06T19:17:18Z",
   "post_count": 17,
   "feed_nature": "undetermined",
   "feed_nature_basis": null,
