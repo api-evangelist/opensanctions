@@ -63,37 +63,89 @@ tags:
   - Public APIs
   - agent-native
 apis:
-  - name: OpenSanctions Screening API
-    description: >-
-      REST API for screening people, companies, vessels and other entities against
-      sanctions, watchlist and PEP data. Query-by-example matching returns scored
-      candidates with per-feature explanations; free-text search, entity fetch with
-      graph traversal, statement-level provenance and an OpenRefine reconciliation
-      manifest round out the surface. Authenticated with an
-      `Authorization: ApiKey <key>` header and metered per logical query.
-    humanURL: https://www.opensanctions.org/docs/api/
-    baseURL: https://api.opensanctions.org
-    tags:
-      - Sanctions Screening
-      - Anti-Money Laundering
-      - Politically Exposed Persons
-      - Compliance
-      - Entity Resolution
-      - Open Data
-    properties:
-      - type: OpenAPI
-        url: openapi/opensanctions-api-openapi.yml
-      - type: Documentation
-        url: https://www.opensanctions.org/docs/api/
-      - type: APIReference
-        url: https://www.opensanctions.org/reference/
-      - type: Overlay
-        url: overlays/opensanctions-api-overlay.yaml
-      - type: ToolCrosswalk
-        url: mcp/opensanctions-tool-crosswalk.yml
-      - type: DataModel
-        url: data-model/opensanctions-data-model.yml
+- aid: opensanctions:opensanctions-data-access-api
+  name: OpenSanctions Data access API
+  description: >-
+    Endpoints for fetching data from the API, either related to individual entities, or for bulk data
+    access in various forms.
+  humanURL: https://www.opensanctions.org/docs/api/
+  baseURL: https://api.opensanctions.org
+  tags:
+  - Data access
+  properties:
+  - type: OpenAPI
+    url: openapi/opensanctions-data-access-api-openapi.yml
+  - type: Documentation
+    url: https://www.opensanctions.org/docs/api/
+  - type: APIReference
+    url: https://www.opensanctions.org/reference/
+  - type: ToolCrosswalk
+    url: mcp/opensanctions-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/opensanctions-data-model.yml
+- aid: opensanctions:opensanctions-matching-api
+  name: OpenSanctions Matching API
+  description: >-
+    Endpoints for conducting a user-facing entity search or matching a local data store against the given
+    dataset.
+  humanURL: https://www.opensanctions.org/docs/api/
+  baseURL: https://api.opensanctions.org
+  tags:
+  - Matching
+  properties:
+  - type: OpenAPI
+    url: openapi/opensanctions-matching-api-openapi.yml
+  - type: Documentation
+    url: https://www.opensanctions.org/docs/api/
+  - type: APIReference
+    url: https://www.opensanctions.org/reference/
+  - type: ToolCrosswalk
+    url: mcp/opensanctions-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/opensanctions-data-model.yml
+- aid: opensanctions:opensanctions-reconciliation-api
+  name: OpenSanctions Reconciliation API
+  description: >-
+    The Reconciliation Service provides four separate endpoints that work in concert to implement the
+    data matching API used by OpenRefine, Wikidata and several other services and utilities.
+  humanURL: https://www.opensanctions.org/docs/api/
+  baseURL: https://api.opensanctions.org
+  tags:
+  - Reconciliation
+  properties:
+  - type: OpenAPI
+    url: openapi/opensanctions-reconciliation-api-openapi.yml
+  - type: Documentation
+    url: https://www.opensanctions.org/docs/api/
+  - type: APIReference
+    url: https://www.opensanctions.org/reference/
+  - type: ToolCrosswalk
+    url: mcp/opensanctions-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/opensanctions-data-model.yml
+- aid: opensanctions:opensanctions-system-information-api
+  name: OpenSanctions System information API
+  description: >-
+    Service metadata endpoints for health checking and getting the application metadata to be used in
+    client applications.
+  humanURL: https://www.opensanctions.org/docs/api/
+  baseURL: https://api.opensanctions.org
+  tags:
+  - System information
+  properties:
+  - type: OpenAPI
+    url: openapi/opensanctions-system-information-api-openapi.yml
+  - type: Documentation
+    url: https://www.opensanctions.org/docs/api/
+  - type: APIReference
+    url: https://www.opensanctions.org/reference/
+  - type: ToolCrosswalk
+    url: mcp/opensanctions-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/opensanctions-data-model.yml
 common:
+  - type: Overlay
+    url: overlays/opensanctions-api-overlay.yaml
   - type: AgenticAccess
     url: agentic-access/opensanctions-agentic-access.yml
   - type: DomainSecurity
