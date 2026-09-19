@@ -55,6 +55,19 @@ tags:
   - Politically Exposed Persons
   - Compliance
   - Financial Crime
+  - KYC
+  - Entity Resolution
+  - Open Data
+  - Risk Data
+  - Due Diligence
+  - Public APIs
+  - agent-native
+tags_raw:
+  - Sanctions Screening
+  - Anti-Money Laundering
+  - Politically Exposed Persons
+  - Compliance
+  - Financial Crime
   - Know Your Customer
   - Entity Resolution
   - Open Data
@@ -71,6 +84,8 @@ apis:
   humanURL: https://www.opensanctions.org/docs/api/
   baseURL: https://api.opensanctions.org
   tags:
+  - Data Access
+  tags_raw:
   - Data access
   properties:
   - type: OpenAPI
@@ -131,6 +146,8 @@ apis:
   humanURL: https://www.opensanctions.org/docs/api/
   baseURL: https://api.opensanctions.org
   tags:
+  - System Information
+  tags_raw:
   - System information
   properties:
   - type: OpenAPI
