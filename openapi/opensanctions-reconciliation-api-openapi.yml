@@ -1,0 +1,339 @@
+openapi: 3.2.0
+info:
+  title: OpenSanctions Reconciliation API
+  description: '## Introduction
+
+
+    The OpenSanctions API allows users to search and query
+
+    the OpenSanctions entity graph.'
+  termsOfService: https://www.opensanctions.org/docs/terms
+  contact:
+    name: OpenSanctions
+    url: https://www.opensanctions.org/
+    email: info@opensanctions.org
+  version: yente 5.5.0
+  x-logo:
+    url: https://assets.opensanctions.org/images/ura/logo_text_spaced.svg
+  externalDocs:
+    description: Home page
+    url: https://www.opensanctions.org
+tags:
+- name: Reconciliation
+  description: The Reconciliation Service provides four separate endpoints that work in concert to implement the data matching API used by OpenRefine, Wikidata and several other services and utilities.
+  externalDocs:
+    description: W3C Community API specification
+    url: https://reconciliation-api.github.io/specs/latest/
+paths:
+  /reconcile/{dataset}:
+    get:
+      tags:
+      - Reconciliation
+      summary: Reconciliation manifest
+      description: 'Reconciliation API, emulates Google Refine API. This endpoint can be used
+
+        to bulk match entities against the system using an end-user application like
+
+        OpenRefine. The reconciliation API uses the same
+
+        search and matching functions as the matching API and will also produce
+
+        scores that reflect additional properties like country or date of birth, if
+
+        specified.
+
+
+        Tutorial: Using OpenRefine to match entities in a spreadsheet.'
+      operationId: reconcile_reconcile__dataset__get
+      parameters:
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Data source or collection name to scope the query to.
+          examples:
+          - default
+          title: Dataset
+        description: Data source or collection name to scope the query to.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FreebaseManifest'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    FreebaseManifestExtendPropertySettingChoice:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - id
+      - name
+      title: FreebaseManifestExtendPropertySettingChoice
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    FreebaseManifestSuggest:
+      properties:
+        entity:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+        type:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+        property:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+      type: object
+      required:
+      - entity
+      - type
+      - property
+      title: FreebaseManifestSuggest
+    FreebaseManifestPreview:
+      properties:
+        url:
+          type: string
+          title: Url
+        width:
+          type: integer
+          title: Width
+        height:
+          type: integer
+          title: Height
+      type: object
+      required:
+      - url
+      - width
+      - height
+      title: FreebaseManifestPreview
+    FreebaseManifest:
+      properties:
+        versions:
+          items:
+            type: string
+          type: array
+          title: Versions
+          examples:
+          - - '0.2'
+        name:
+          type: string
+          title: Name
+          examples:
+          - yente
+        identifierSpace:
+          type: string
+          minLength: 1
+          format: uri
+          title: Identifierspace
+        schemaSpace:
+          type: string
+          minLength: 1
+          format: uri
+          title: Schemaspace
+        documentation:
+          type: string
+          minLength: 1
+          format: uri
+          title: Documentation
+        batchSize:
+          type: integer
+          title: Batchsize
+        view:
+          $ref: '#/components/schemas/FreebaseManifestView'
+        preview:
+          $ref: '#/components/schemas/FreebaseManifestPreview'
+        suggest:
+          $ref: '#/components/schemas/FreebaseManifestSuggest'
+        extend:
+          $ref: '#/components/schemas/FreebaseManifestExtend'
+        defaultTypes:
+          items:
+            $ref: '#/components/schemas/FreebaseType'
+          type: array
+          title: Defaulttypes
+      type: object
+      required:
+      - versions
+      - name
+      - identifierSpace
+      - schemaSpace
+      - documentation
+      - batchSize
+      - view
+      - preview
+      - suggest
+      - extend
+      - defaultTypes
+      title: FreebaseManifest
+    FreebaseManifestExtendProposeProperties:
+      properties:
+        service_url:
+          type: string
+          minLength: 1
+          format: uri
+          title: Service Url
+        service_path:
+          type: string
+          title: Service Path
+      type: object
+      required:
+      - service_url
+      - service_path
+      title: FreebaseManifestExtendProposeProperties
+    FreebaseManifestView:
+      properties:
+        url:
+          type: string
+          title: Url
+      type: object
+      required:
+      - url
+      title: FreebaseManifestView
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    FreebaseType:
+      properties:
+        id:
+          type: string
+          title: Id
+          examples:
+          - Person
+        name:
+          type: string
+          title: Name
+          examples:
+          - People
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+      type: object
+      required:
+      - id
+      - name
+      title: FreebaseType
+    FreebaseManifestSuggestType:
+      properties:
+        service_url:
+          type: string
+          minLength: 1
+          format: uri
+          title: Service Url
+        service_path:
+          type: string
+          title: Service Path
+      type: object
+      required:
+      - service_url
+      - service_path
+      title: FreebaseManifestSuggestType
+    FreebaseManifestExtendPropertySetting:
+      properties:
+        name:
+          type: string
+          title: Name
+        label:
+          type: string
+          title: Label
+        type:
+          type: string
+          title: Type
+        default:
+          title: Default
+        help_text:
+          type: string
+          title: Help Text
+        choices:
+          items:
+            $ref: '#/components/schemas/FreebaseManifestExtendPropertySettingChoice'
+          type: array
+          title: Choices
+          default: []
+      type: object
+      required:
+      - name
+      - label
+      - type
+      - default
+      - help_text
+      title: FreebaseManifestExtendPropertySetting
+    FreebaseManifestExtend:
+      properties:
+        propose_properties:
+          $ref: '#/components/schemas/FreebaseManifestExtendProposeProperties'
+        propose_settings:
+          items:
+            $ref: '#/components/schemas/FreebaseManifestExtendPropertySetting'
+          type: array
+          title: Propose Settings
+      type: object
+      required:
+      - propose_properties
+      - propose_settings
+      title: FreebaseManifestExtend

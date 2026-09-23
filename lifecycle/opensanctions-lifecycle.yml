@@ -1,0 +1,111 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://www.opensanctions.org/docs/data/changes/ ,
+  https://www.opensanctions.org/docs/terms/api/ ,
+  https://www.opensanctions.org/changelog/ , https://status.opensanctions.org/ ,
+  and openapi/opensanctions-api-openapi.yml
+versioning:
+  scheme: unversioned-path
+  current: null
+  docs: https://www.opensanctions.org/docs/data/changes/
+  note: >-
+    The hosted API is NOT versioned in the URI — https://api.opensanctions.org has no
+    /v1/ segment and the OpenAPI carries no info.version discriminator for the HTTP
+    contract. Stability is managed by announced change windows rather than parallel
+    versions. The SELF-HOSTED product (yente) does use semantic versioning, and each
+    major version has "a service life of one year".
+deprecation:
+  policy_url: https://www.opensanctions.org/docs/data/changes/
+  sunset_header: false
+  deprecation_header: false
+  notice_periods:
+    - surface: hosted API deprecations
+      notice: 3 months prior to effective date
+    - surface: data-model property/entity-type name changes
+      notice: 3 months
+    - surface: data-model removals
+      notice: 3 months prior to effective date
+    - surface: export format changes
+      notice: 3 months prior to effective date
+    - surface: dataset removal
+      notice: 2 months prior (except where required by law)
+    - surface: self-hosted API (yente)
+      notice: tied to a major semantic version change; one-year service life per major
+  announcement_channels:
+    - https://www.opensanctions.org/changelog/
+    - https://www.opensanctions.org/changelog/rss/
+    - https://www.opensanctions.org/newsletter/
+  note: >-
+    A genuinely strong policy — dated, per-surface, and forward-published. What is
+    missing is the RUNTIME signal: no RFC 8594 Sunset or Deprecation response header
+    is emitted, so a deprecation is only discoverable by a human reading the
+    changelog, never by the client that is calling the deprecated thing.
+deprecated_operations: []
+deprecated_parameters:
+  - openapi/opensanctions-api-openapi.yml#match_match__dataset__post?cutoff
+    # schema marked deprecated:true, title: "Deprecated, use `threshold` instead."
+deprecated_features:
+  - feature: "`name-based` and `name-qualified` matching algorithms"
+    replacement: "`ofac` algorithm"
+    announced: '2026-06-26'
+    effective: '2027-01-18'
+    source: https://www.opensanctions.org/changelog/46/
+  - feature: "`logic-v1` scoring algorithm"
+    replacement: "`logic-v2` (default since 2025-09-17); prefer `?algorithm=best`"
+    source: https://www.opensanctions.org/changelog/35/
+  - feature: "`cutoff` query parameter on /match"
+    replacement: "`threshold`"
+    status: >-
+      Removal was announced then SUSPENDED (changelog/34/, 2025-09-12); the parameter
+      is still present in the spec and still flagged deprecated.
+    source: https://www.opensanctions.org/changelog/34/
+sla:
+  url: https://www.opensanctions.org/docs/terms/api/
+  effective_date: '2025-09-08'
+  uptime_target: 99.9% on an annual basis
+  exclusions: unplanned maintenance, third-party attacks, force majeure
+  planned_downtime_cap: six (6) hours per calendar month
+  planned_downtime_notice: >-
+    downtimes exceeding 3 hours require at least three (3) days advance notice by
+    email and in the dashboard
+  support_response_times:
+    - {severity: Critical Errors, response: 2 Service Hours}
+    - {severity: Major Errors, response: 8 Service Hours}
+    - {severity: Other Errors, response: 16 Service Hours}
+  service_hours: Monday-Friday 08:30-16:30 CET, excluding Berlin holidays and Dec 24-31
+  termination_notice: two weeks' notice to the end of the month
+  terms_amendment_objection_window: four (4) weeks
+  service_credits: none specified
+status_page:
+  url: https://status.opensanctions.org/
+  vendor: Atlassian Statuspage
+  probed_status: 200
+  machine_readable:
+    rss: true
+    atom: true
+    json: true
+    webhook: true
+    slack: true
+  components:
+    - API / Fetch entity API
+    - API / Search API
+    - API / Statement-based data API
+    - API / Matching API
+    - Data pipeline / Publication of the `default` dataset
+    - Data pipeline / Publication of the `sanctions` dataset
+    - Data pipeline / Re-generate the global metadata index
+    - Web site / Home page
+    - Web site / Web site search function
+    - Web site / Website has been re-generated
+  note: >-
+    Per-endpoint status components — API consumers can subscribe to just the
+    Matching API rather than the whole service. The JSON export makes the status
+    page itself machine-readable, which is rarer than the status page existing.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://www.opensanctions.org/docs/data/changes/', status: 200}
+    - {url: 'https://www.opensanctions.org/docs/terms/api/', status: 200}
+    - {url: 'https://status.opensanctions.org/', status: 200}
+    - {url: 'https://www.opensanctions.org/changelog/rss/', status: 200}

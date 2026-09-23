@@ -1,0 +1,145 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  openapi/opensanctions-api-openapi.yml (harvested from
+  https://api.opensanctions.org/openapi.json), plus
+  https://www.opensanctions.org/docs/security/ ,
+  https://www.opensanctions.org/docs/bulk/senzing/ ,
+  https://www.opensanctions.org/docs/metadata/ , https://followthemoney.tech/ and
+  live response-header probes on 2026-08-27
+standards:
+  - id: openapi-3.1
+    conforms: true
+    evidence: >-
+      openapi: 3.1.0 served at https://api.opensanctions.org/openapi.json (200,
+      application/json, 12 paths, 42 component schemas).
+  - id: reconciliation-service-api
+    conforms: true
+    domain_standard: true
+    evidence: >-
+      GET /reconcile/{dataset} (operationId reconcile_reconcile__dataset__get)
+      returns a FreebaseManifest, with FreebaseManifestSuggest / -Preview / -View /
+      -Extend / -ExtendPropertySetting / FreebaseType component schemas. That is the
+      W3C Entity Reconciliation CG Reconciliation Service API manifest shape
+      (OpenRefine's "Freebase" lineage), declared in the CONTRACT rather than
+      claimed on a page.
+    spec_location: '#/paths/~1reconcile~1{dataset}/get and #/components/schemas/FreebaseManifest'
+    significance: >-
+      This is the domain-standard signature for this market: any OpenRefine, Wikidata
+      or reconciliation-aware client can point at OpenSanctions with no bespoke
+      connector.
+  - id: followthemoney
+    conforms: true
+    domain_standard: true
+    evidence: >-
+      Every entity payload is a FollowTheMoney entity — EntityResponse carries
+      schema/properties/datasets/referents/target/first_seen/last_seen/last_change,
+      and the schema vocabulary (Person, Company, Vessel, Organization, ...) is the
+      FtM ontology. FtM is stewarded by OpenSanctions itself
+      (github.com/opensanctions/followthemoney) and is the de-facto interchange
+      format for anti-corruption / financial-crime data, with Python, TypeScript and
+      JVM bindings.
+    spec_location: '#/components/schemas/EntityResponse'
+  - id: senzing-entity-specification
+    conforms: true
+    domain_standard: true
+    evidence: >-
+      A first-party Senzing entity-resolution export is published as a bulk data
+      format (https://www.opensanctions.org/docs/bulk/senzing/), letting a Senzing
+      deployment ingest the dataset without a mapping layer. Bulk-data surface, not
+      an API endpoint.
+  - id: w3c-trace-context
+    conforms: true
+    evidence: >-
+      Live responses carry `traceparent: 00-<trace-id>-<span-id>-00` and
+      `tracestate: yente=<span-id>` (probed 2026-08-27 on /healthz and /catalog).
+  - id: http-conditional-requests
+    conforms: true
+    evidence: >-
+      GET /catalog returns a strong ETag and `cache-control: public, max-age=300`,
+      and the spec declares a 304 "The catalog has not changed." response.
+  - id: iso-27001
+    conforms: true
+    evidence: >-
+      "ISO/IEC 27001:2022 certified by Consilium Labs" stated on
+      https://www.opensanctions.org/docs/security/ ; posture published at
+      https://trust.opensanctions.org/ (Vanta-hosted).
+  - id: cc-by-nc-4.0
+    conforms: true
+    evidence: >-
+      The dataset is licensed CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/),
+      referenced site-wide and per dataset in the /catalog `license` field.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      Errors use the FastAPI `{"detail": ...}` envelope with content-type
+      application/json; no application/problem+json anywhere in the spec.
+  - id: oauth2
+    conforms: false
+    evidence: >-
+      No oauth2 securityScheme; authentication is a custom
+      `Authorization: ApiKey <key>` header.
+  - id: oidc
+    conforms: false
+    evidence: /.well-known/openid-configuration returns 404 on both hosts.
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on api.opensanctions.org and
+      www.opensanctions.org. A real disclosure policy exists at
+      /docs/security/ but is not machine-discoverable.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: >-
+      A dated deprecation policy with 2-3 month notice windows is published
+      (/docs/data/changes/) but no Sunset or Deprecation response header is emitted.
+  - id: rfc9239-ratelimit-headers
+    conforms: false
+    evidence: >-
+      No RateLimit-* / X-RateLimit-* / Retry-After headers observed on live
+      responses; quota exhaustion surfaces only as a bare 429.
+  - id: dcat
+    conforms: false
+    evidence: >-
+      GET /catalog returns a bespoke DataCatalogModel (477 datasets; fields
+      name/title/license/summary/coverage/resources/children/deprecation) rather than
+      DCAT or a CKAN package API. Checked because `dcat` and `ckan` are on the
+      government/open-data regime's standards shortlist in scoring.yml.
+  - id: ckan
+    conforms: false
+    evidence: No /api/3/action/* CKAN surface; the catalog is the custom model above.
+  - id: json-api
+    conforms: false
+    evidence: Plain JSON responses; no JSON:API media type or document structure.
+  - id: pagination
+    conforms: true
+    evidence: >-
+      limit/offset with limit/offset/total/results echoed in SearchResponse and
+      StatementResponse; `total` is a {value, relation} TotalSpec.
+  - id: idempotency
+    conforms: na
+    evidence: >-
+      Read-only API — no create/mutate/destroy surface for an idempotency key to
+      protect. See conventions/opensanctions-conventions.yml.
+compliance_program:
+  published: true
+  url: https://trust.opensanctions.org/
+  vendor: Vanta
+  certifications:
+    - ISO/IEC 27001:2022
+  note: >-
+    The trust center at trust.opensanctions.org returns 200 but renders entirely
+    client-side (the served HTML body is 28 characters of text: "OpenSanctions Trust
+    Center"), so the certification list could not be read from it by a machine. The
+    ISO/IEC 27001:2022 certification is taken from the provider's own
+    server-rendered /docs/security/ page instead, which names the auditor
+    (Consilium Labs).
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://api.opensanctions.org/openapi.json', status: 200}
+    - {url: 'https://api.opensanctions.org/catalog', status: 200}
+    - {url: 'https://api.opensanctions.org/reconcile/default', status: 401, note: 'manifest is key-gated; shape read from the spec'}
+    - {url: 'https://www.opensanctions.org/docs/security/', status: 200}
+    - {url: 'https://trust.opensanctions.org/', status: 200, note: 'JS-rendered shell, 28 chars of text'}
+    - {url: 'https://api.opensanctions.org/.well-known/security.txt', status: 404}

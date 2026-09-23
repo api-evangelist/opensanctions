@@ -1,0 +1,988 @@
+openapi: 3.2.0
+info:
+  title: OpenSanctions Data access API
+  description: '## Introduction
+
+
+    The OpenSanctions API allows users to search and query
+
+    the OpenSanctions entity graph.'
+  termsOfService: https://www.opensanctions.org/docs/terms
+  contact:
+    name: OpenSanctions
+    url: https://www.opensanctions.org/
+    email: info@opensanctions.org
+  version: yente 5.5.0
+  x-logo:
+    url: https://assets.opensanctions.org/images/ura/logo_text_spaced.svg
+  externalDocs:
+    description: Home page
+    url: https://www.opensanctions.org
+tags:
+- name: Data Access
+  description: Endpoints for fetching data from the API, either related to individual entities, or for bulk data access in various forms.
+  externalDocs:
+    description: Data dictionary
+    url: https://opensanctions.org/reference/
+paths:
+  /entities/{entity_id}:
+    get:
+      tags:
+      - Data Access
+      summary: Fetch Entity
+      description: 'Retrieve a single entity by its ID. The entity will be returned in
+
+        full, with data from all datasets and with nested entities (adjacent
+
+        passport, sanction and associated entities) included. If the entity ID
+
+        has been merged into a different canonical entity, an HTTP redirect will
+
+        be triggered.
+
+
+        Intro: entity data model.'
+      operationId: fetch_entity_entities__entity_id__get
+      parameters:
+      - name: entity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the entity to retrieve
+          examples:
+          - Q7747
+          title: Entity Id
+        description: ID of the entity to retrieve
+      - name: nested
+        in: query
+        required: false
+        schema:
+          type: boolean
+          title: Include adjacent entities (e.g. addresses, family) in response
+          default: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+        '308':
+          description: The entity was merged into another ID
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /entities/{entity_id}/adjacent:
+    get:
+      tags:
+      - Data Access
+      summary: Fetch Adjacent Entities*
+      description: '***Beta:** This endpoint is released for wider testing and is not yet recommended
+
+        for production use. We welcome feedback. Its interface may change without announcement.
+
+
+        Retrieve entities adjacent to a given entity e.g. passports, sanctions, associates.
+
+
+        This endpoint offers the same information as adjacent entities nested in
+
+        `/entities/{entity_id}`,
+
+        but offers pagination for cases where the number of results is potentially very large.'
+      operationId: Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      parameters:
+      - name: entity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the entity whose graph context was requested
+          examples:
+          - Q7747
+          title: Entity Id
+        description: ID of the entity whose graph context was requested
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Sorting criteria
+          default: []
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          title: Number of results per property to return
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 9499
+          title: Start at result with given offset
+          default: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityAdjacentResponse'
+        '308':
+          description: The entity was merged into another ID
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /entities/{entity_id}/adjacent/{property_name}:
+    get:
+      tags:
+      - Data Access
+      summary: Fetch Adjacent By Property*
+      description: '***Beta:** This endpoint is released for wider testing and is not yet recommended
+
+        for production use. We welcome feedback. Its interface may change without announcement.
+
+
+        Retrieve entities adjacent to a given entity for a specific property.
+
+
+        This endpoint offers the same information as adjacent entities nested in
+
+        `/entities/{entity_id}`,
+
+        but offers pagination for cases where the number of results is potentially very large.'
+      operationId: Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+      parameters:
+      - name: entity_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: ID of the entity hose graph context was requested
+          examples:
+          - Q7747
+          title: Entity Id
+        description: ID of the entity hose graph context was requested
+      - name: property_name
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Name of the property to fetch adjacent entities for
+          examples:
+          - address
+          - ownershipOwner
+          title: Property Name
+        description: Name of the property to fetch adjacent entities for
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Sorting criteria
+          default: []
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          title: Number of results per property to return
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 9499
+          title: Start at result with given offset
+          default: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjacentResultsResponse'
+        '308':
+          description: The entity was merged into another ID
+        '404':
+          description: Entity or property not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /catalog:
+    get:
+      tags:
+      - Data Access
+      summary: Data catalog
+      description: 'Return the service manifest, which includes a list of all indexed datasets.
+
+
+        The manifest is the configuration file of the yente service. It specifies what
+
+        data sources are included, and how often they should be loaded.'
+      operationId: catalog_catalog_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataCatalogModel'
+        '304':
+          description: The catalog has not changed.
+  /statements:
+    get:
+      tags:
+      - Data Access
+      summary: Statement-based records
+      description: 'Access raw entity data as statements.
+
+
+        Read statement-based data model
+
+        for context regarding this endpoint.
+
+
+        Using this endpoint does not incur a charge, but a valid API key must be supplied.'
+      operationId: statements_statements_get
+      parameters:
+      - name: dataset
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by dataset
+      - name: entity_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by source entity ID
+      - name: canonical_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by normalised entity ID
+      - name: prop
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by property name
+      - name: prop_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by property type
+      - name: value
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by property value
+      - name: schema
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Filter by schema type
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Sorting criteria
+          default:
+          - canonical_id
+          - prop
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 5000
+          title: Number of results to return
+          default: 50
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 9499
+          title: Number of results to skip before returning them
+          default: 0
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    DataCoverage:
+      properties:
+        start:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End
+        countries:
+          items:
+            type: string
+          type: array
+          title: Countries
+          default: []
+        frequency:
+          type: string
+          enum:
+          - unknown
+          - never
+          - hourly
+          - daily
+          - weekly
+          - monthly
+          - annually
+          title: Frequency
+          default: unknown
+        schedule:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Schedule
+      type: object
+      title: DataCoverage
+      description: Details on the temporal and geographic scope of a dataset.
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    EntityResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+          examples:
+          - NK-A7z....
+        caption:
+          type: string
+          title: Caption
+          examples:
+          - John Doe
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - LegalEntity
+        properties:
+          additionalProperties:
+            items:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/EntityResponse'
+            type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+        datasets:
+          items:
+            type: string
+          type: array
+          title: Datasets
+          default: []
+          examples:
+          - - us_ofac_sdn
+        referents:
+          items:
+            type: string
+          type: array
+          title: Referents
+          default: []
+          examples:
+          - - ofac-1234
+        target:
+          type: boolean
+          title: Target
+          default: false
+        first_seen:
+          title: First Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_seen:
+          title: Last Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_change:
+          title: Last Change
+          examples:
+          - '2026-01-01T12:00:00Z'
+      type: object
+      required:
+      - id
+      - caption
+      - schema
+      - properties
+      title: EntityResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    EntityAdjacentResponse:
+      properties:
+        entity:
+          $ref: '#/components/schemas/EntityResponse'
+        adjacent:
+          additionalProperties:
+            $ref: '#/components/schemas/AdjacentResultsResponse'
+          type: object
+          title: Adjacent
+      type: object
+      required:
+      - entity
+      - adjacent
+      title: EntityAdjacentResponse
+    YenteDatasetModel:
+      properties:
+        name:
+          type: string
+          title: Name
+        title:
+          type: string
+          title: Title
+        license:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: License
+        summary:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Summary
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        last_export:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Export
+        entity_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Entity Count
+        thing_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Thing Count
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+          default: []
+        publisher:
+          anyOf:
+          - $ref: '#/components/schemas/DataPublisher'
+          - type: 'null'
+        coverage:
+          anyOf:
+          - $ref: '#/components/schemas/DataCoverage'
+          - type: 'null'
+        resources:
+          items:
+            $ref: '#/components/schemas/DataResource'
+          type: array
+          title: Resources
+          default: []
+        children:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Children
+          default: []
+        deprecation:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Deprecation
+        deprecated:
+          type: boolean
+          title: Deprecated
+          default: false
+        load:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Load
+        entities_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Entities Url
+        delta_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Delta Url
+        namespace:
+          type: boolean
+          title: Namespace
+          default: false
+        index_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Index Version
+        index_current:
+          type: boolean
+          title: Index Current
+          readOnly: true
+      type: object
+      required:
+      - name
+      - title
+      - index_current
+      title: YenteDatasetModel
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    TotalSpec:
+      properties:
+        value:
+          type: integer
+          title: Value
+          examples:
+          - 42
+        relation:
+          type: string
+          title: Relation
+          default: eq
+          examples:
+          - eq
+      type: object
+      required:
+      - value
+      title: TotalSpec
+    Statement:
+      properties:
+        id:
+          type: string
+          title: Id
+          examples:
+          - 0000ad52d4d91a8...
+        entity_id:
+          type: string
+          title: Entity Id
+          examples:
+          - ofac-1234
+        canonical_id:
+          type: string
+          title: Canonical Id
+          examples:
+          - NK-1234
+        prop:
+          type: string
+          title: Prop
+          examples:
+          - alias
+        prop_type:
+          type: string
+          title: Prop Type
+          examples:
+          - name
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - LegalEntity
+        value:
+          type: string
+          title: Value
+          examples:
+          - John Doe
+        original_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Original Value
+          examples:
+          - John Doe (Esq.)
+        dataset:
+          type: string
+          title: Dataset
+          examples:
+          - us_ofac_sdn
+        lang:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Lang
+          examples:
+          - eng
+        origin:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Origin
+          examples:
+          - inferred
+          - patch
+        first_seen:
+          type: string
+          format: date-time
+          title: First Seen
+        last_seen:
+          type: string
+          format: date-time
+          title: Last Seen
+      type: object
+      required:
+      - id
+      - entity_id
+      - canonical_id
+      - prop
+      - prop_type
+      - schema
+      - value
+      - dataset
+      - first_seen
+      - last_seen
+      title: Statement
+    DataResource:
+      properties:
+        name:
+          type: string
+          title: Name
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        checksum:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Checksum
+        timestamp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timestamp
+        mime_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Size
+        mime_type_label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type Label
+          readOnly: true
+      type: object
+      required:
+      - name
+      - mime_type_label
+      title: DataResource
+      description: A downloadable resource that is part of a dataset.
+    DataPublisher:
+      properties:
+        name:
+          type: string
+          title: Name
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        name_en:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name En
+        acronym:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Acronym
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        official:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Official
+          default: false
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+        country_label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country Label
+          readOnly: true
+      type: object
+      required:
+      - name
+      - country_label
+      title: DataPublisher
+      description: Publisher information, eg. the government authority.
+    AdjacentResultsResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            anyOf:
+            - type: string
+            - $ref: '#/components/schemas/EntityResponse'
+          type: array
+          title: Results
+          default: []
+          examples:
+          - - id: ds-abc-own-123
+              properties:
+                asset:
+                - caption: Company 1 Ltd.
+                  id: NK-1234
+                  properties:
+                    name:
+                    - Company 1 Ltd.
+                  schema: Comany
+              schema: Ownership
+      type: object
+      required:
+      - limit
+      - total
+      title: AdjacentResultsResponse
+    DataCatalogModel:
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/YenteDatasetModel'
+          type: array
+          title: Datasets
+        current:
+          items:
+            type: string
+          type: array
+          title: Current
+        outdated:
+          items:
+            type: string
+          type: array
+          title: Outdated
+        index_stale:
+          type: boolean
+          title: Index Stale
+          default: false
+      type: object
+      required:
+      - datasets
+      - current
+      - outdated
+      title: DataCatalogModel
+    StatementResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            $ref: '#/components/schemas/Statement'
+          type: array
+          title: Results
+      type: object
+      required:
+      - limit
+      - total
+      - results
+      title: StatementResponse

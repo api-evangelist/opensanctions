@@ -1,0 +1,124 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://www.opensanctions.org/docs/opensource/ ,
+  https://www.opensanctions.org/llms.txt ,
+  https://followthemoney.tech/libraries/ , and the PyPI/npm/Maven Central registry
+  metadata endpoints for each package (versions + dates read 2026-08-27).
+note: >-
+  OpenSanctions ships one first-party client SDK for the hosted screening API
+  (yente-client, which also carries the `yente-cli` CLI and the `yente-mcp` MCP
+  server as extras) plus the FollowTheMoney data-model libraries the API's payloads
+  are expressed in. FollowTheMoney was transferred to the OpenSanctions GitHub
+  organisation (github.com/opensanctions/followthemoney) and is published from
+  info@opensanctions.org, so it is counted first-party here even though it is
+  distributed under the followthemoney.tech brand.
+packages:
+  - language: python
+    registry: pypi
+    name: yente-client
+    url: https://pypi.org/project/yente-client/
+    install: pip install yente-client
+    official: true
+    role: api-sdk
+    version: 0.2.0
+    published: '2026-07-23'
+    repository: https://github.com/opensanctions/yente-client
+    docs: https://yenteclient.followthemoney.tech/
+    note: >-
+      Typed SDK for api.opensanctions.org and self-hosted yente. Extras:
+      `pip install 'yente-client[cli]'` adds the `yente-cli` command-line tool;
+      `pip install 'yente-client[mcp]'` adds the `yente-mcp` MCP server.
+  - language: python
+    registry: pypi
+    name: followthemoney
+    url: https://pypi.org/project/followthemoney/
+    install: pip install followthemoney
+    official: true
+    role: data-model
+    version: 4.10.2
+    published: '2026-08-19'
+    repository: https://github.com/opensanctions/followthemoney
+    docs: https://followthemoney.tech/
+    note: The FtM ontology the API's entity payloads are expressed in.
+  - language: javascript
+    registry: npm
+    name: "@opensanctions/followthemoney"
+    url: https://www.npmjs.com/package/@opensanctions/followthemoney
+    install: npm install @opensanctions/followthemoney
+    official: true
+    role: data-model
+    version: 4.10.2
+    published: '2026-08-19'
+    repository: https://github.com/opensanctions/followthemoney
+    note: >-
+      TypeScript/JavaScript bindings for reading FtM schema metadata and entity
+      data, plus entity-type icons. Reading/rendering only — no data cleaning.
+  - language: java
+    registry: maven
+    name: tech.followthemoney:followthemoney
+    url: https://repo1.maven.org/maven2/tech/followthemoney/followthemoney/
+    install: "<dependency><groupId>tech.followthemoney</groupId><artifactId>followthemoney</artifactId><version>4.10.2</version></dependency>"
+    official: true
+    role: data-model
+    version: 4.10.2
+    published: '2026-08-19'
+    repository: https://github.com/opensanctions/followthemoney
+    note: >-
+      JVM bindings (Java/Scala/Kotlin) covering schema metadata plus value-based
+      and statement-based entity data. Version/date read from Maven Central
+      maven-metadata.xml (lastUpdated 20260819114423); the search.maven.org
+      solrsearch endpoint did not respond on this run.
+  - language: python
+    registry: pypi
+    name: nomenklatura
+    url: https://pypi.org/project/nomenklatura/
+    install: pip install nomenklatura
+    official: true
+    role: matching-library
+    version: 4.14.0
+    published: '2026-08-23'
+    repository: https://github.com/opensanctions/nomenklatura
+    note: Record linkage / de-duplication over FtM data; the matcher behind /match.
+  - language: python
+    registry: pypi
+    name: rigour
+    url: https://pypi.org/project/rigour/
+    install: pip install rigour
+    official: true
+    role: utility
+    version: 2.3.1
+    published: '2026-07-30'
+    repository: https://github.com/opensanctions/rigour
+    docs: https://rigour.followthemoney.tech/
+    note: Cleaning and validating FtM property types (names, addresses, identifiers).
+  - language: python
+    registry: pypi
+    name: zavod
+    url: https://pypi.org/project/zavod/
+    install: pip install zavod
+    official: true
+    role: data-pipeline
+    version: 0.7.3
+    published: '2023-07-07'
+    repository: https://github.com/opensanctions/zavod
+    note: >-
+      DECAY SIGNAL — the crawler/data-factory framework's last PyPI release is
+      2023-07-07, more than three years stale. Development moved into the
+      github.com/opensanctions/opensanctions monorepo, where zavod is vendored
+      rather than released; the registry copy should not be treated as current.
+  - language: python
+    registry: none
+    name: yente
+    url: https://github.com/opensanctions/yente
+    install: docker run -p 8000:8000 ghcr.io/opensanctions/yente
+    official: true
+    role: self-hosted-server
+    version: null
+    published: null
+    docs: https://yente.followthemoney.tech/
+    note: >-
+      The API server itself, MIT-licensed for on-premise screening. Distributed as
+      a container image (ghcr.io) and a Git repo, not via a language package
+      registry, so there is no registry metadata endpoint to read a version from —
+      recorded as null rather than guessed.

@@ -1,0 +1,25 @@
+generated: '2026-08-27'
+method: generated
+source: >-
+  openapi/opensanctions-api-openapi.yml plus the OpenSanctions API documentation.
+  No provider-published AGENTS.md or skills directory was found; the provider's
+  agent-facing guidance is https://www.opensanctions.org/llms.txt (saved verbatim to
+  llms/opensanctions-llms.txt) and the yente-cli / yente-mcp docs.
+api: openapi/opensanctions-api-openapi.yml
+skills:
+  - file: opensanctions-screen-entity.md
+    name: Screen a person or company against sanctions and PEP lists
+    api: openapi/opensanctions-api-openapi.yml
+    operations: [match_match__dataset__post, algorithms_algorithms_get, catalog_catalog_get]
+  - file: opensanctions-investigate-entity.md
+    name: Investigate an entity and audit where each claim came from
+    api: openapi/opensanctions-api-openapi.yml
+    operations:
+      - fetch_entity_entities__entity_id__get
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+      - statements_statements_get
+  - file: opensanctions-monitor-datasets.md
+    name: Keep a screening integration fresh and monitor for changes
+    api: openapi/opensanctions-api-openapi.yml
+    operations: [catalog_catalog_get, search_search__dataset__get, healthz_healthz_get, readyz_readyz_get]

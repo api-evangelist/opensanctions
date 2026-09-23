@@ -1,0 +1,62 @@
+generated: '2026-08-27'
+method: probed
+source: live GET of each /.well-known/ path on the API host and the website host, 2026-08-27
+hit_count: 0
+note: >-
+  Every /.well-known/ path probed returned 404 on both hosts. On
+  api.opensanctions.org the 404 is a genuine JSON 404 (22 bytes,
+  {"detail":"Not Found"}); on www.opensanctions.org the 404 is the site's
+  styled HTML 404 page (72,085 bytes) served with a real 404 status, so it is a
+  true negative rather than a soft-404 catch-all. No WellKnown or SecurityTxt
+  pointer is emitted — this file records an absence, not a surface.
+  OpenSanctions DOES publish a machine-readable discovery document, but at
+  https://www.opensanctions.org/llms.txt (200, saved to llms/) rather than under
+  /.well-known/. Their security policy is a docs page
+  (https://www.opensanctions.org/docs/security/, 200) and not an RFC 9116
+  security.txt, which is the single cheapest fix available to this provider.
+hosts:
+  - host: https://api.opensanctions.org
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://www.opensanctions.org
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+other_discovery:
+  - url: https://www.opensanctions.org/llms.txt
+    status: 200
+    saved: llms/opensanctions-llms.txt
+  - url: https://api.opensanctions.org/openapi.json
+    status: 200
+    saved: openapi/_original/opensanctions-openapi.json
+  - url: https://www.opensanctions.org/opensearch.xml
+    status: not-probed

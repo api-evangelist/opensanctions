@@ -1,0 +1,127 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/opensanctions-api-openapi.yml
+docs: https://www.opensanctions.org/docs/api/faq/
+format: custom-json
+envelope:
+  content_type: application/json
+  shape: '{"detail": "<human-readable message>"}'
+  schema: ErrorResponse
+  rfc9457: false
+  note: >-
+    NOT RFC 9457 problem+json. The API is FastAPI-generated and returns the
+    framework's `{"detail": ...}` envelope with content-type application/json.
+    Validation failures (422) use the richer FastAPI HTTPValidationError shape,
+    a `detail[]` array of {loc, msg, type} objects — so the envelope is not even
+    internally consistent between 4xx classes.
+problems:
+  - status: 400
+    title: Invalid query
+    schema: ErrorResponse
+    source_operations:
+      - match_match__dataset__post
+      - search_search__dataset__get
+      - reconcile_reconcile__dataset__get
+    remediation: Correct the query syntax, dataset scope, or filter arguments.
+  - status: 401
+    title: No API key provided
+    schema: ErrorResponse
+    observed_body: '{"detail":"No API key provided."}'
+    source_operations: [observed live, not declared in the spec]
+    remediation: >-
+      Send `Authorization: ApiKey <key>`. NOT DECLARED IN THE OPENAPI — the 401 is
+      real (probed 2026-08-27 on GET /search/default) but no operation lists it.
+  - status: 403
+    title: Authorization error
+    schema: ErrorResponse
+    source_operations: [force_update_updatez_post]
+    remediation: >-
+      /updatez requires the instance update token; meaningful only on a self-hosted
+      yente deployment.
+  - status: 404
+    title: Entity not found
+    schema: ErrorResponse
+    source_operations:
+      - fetch_entity_entities__entity_id__get
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+    remediation: >-
+      The entity ID does not exist in the requested scope. Note the sibling 308:
+      a merged entity redirects to its canonical ID rather than 404ing.
+  - status: 422
+    title: Validation Error
+    schema: HTTPValidationError
+    source_operations:
+      - match_match__dataset__post
+      - search_search__dataset__get
+      - fetch_entity_entities__entity_id__get
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+      - reconcile_reconcile__dataset__get
+      - force_update_updatez_post
+      - statements_statements_get
+    remediation: >-
+      Request parameters failed schema validation. `detail[]` carries per-field
+      {loc, msg, type} entries naming the offending parameter.
+  - status: 429
+    title: Monthly quota exceeded
+    schema: ErrorResponse
+    source_operations: [documented in the FAQ, not declared in the spec]
+    remediation: >-
+      Both trial and paid keys carry a monthly request ceiling; requests are
+      rejected until the beginning of the next month. Contact OpenSanctions to
+      raise the quota. NOT DECLARED IN THE OPENAPI.
+  - status: 500
+    title: Server error
+    schema: ErrorResponse
+    source_operations:
+      - match_match__dataset__post
+      - search_search__dataset__get
+      - fetch_entity_entities__entity_id__get
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+      - reconcile_reconcile__dataset__get
+      - healthz_healthz_get
+    remediation: Retry with backoff; check https://status.opensanctions.org/ .
+  - status: 503
+    title: Index is not ready
+    schema: ErrorResponse
+    source_operations: [readyz_readyz_get]
+    remediation: The search index is still loading; retry after the readiness probe passes.
+non_error_conditions:
+  - status: 304
+    title: The catalog has not changed
+    source_operations: [catalog_catalog_get]
+    note: >-
+      Conditional GET. /catalog returns an ETag and `cache-control: public,
+      max-age=300`; send If-None-Match to avoid re-downloading ~1.7 MB.
+  - status: 308
+    title: The entity was merged into another ID
+    source_operations:
+      - fetch_entity_entities__entity_id__get
+      - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+      - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+    note: >-
+      De-duplication is visible in the protocol: a stored entity ID that was merged
+      permanently redirects to its canonical ID. Clients that do not follow 308
+      will silently lose the record.
+client_error_mapping:
+  source: >-
+    https://raw.githubusercontent.com/opensanctions/yente-client/refs/heads/main/python/README.md
+  library: yente-client
+  exceptions:
+    - {exception: BadRequestError, status: '400'}
+    - {exception: AuthenticationError, status: '401, 403'}
+    - {exception: NotFoundError, status: '404'}
+    - {exception: RateLimitError, status: '429', note: carries .retry_after when set}
+    - {exception: ServerError, status: '5xx'}
+    - {exception: APIError, status: other, note: carries .status_code and .detail}
+    - {exception: TransportError, status: network failure before the request reached the server}
+  retries: >-
+    "Retries are not built in — failed requests raise; callers handle backoff."
+  cli_exit_codes:
+    - {code: 0, meaning: one or more results}
+    - {code: 1, meaning: zero results}
+    - {code: 2, meaning: usage error (bad flag, unknown schema/property)}
+    - {code: 3, meaning: API error (4xx, 5xx)}
+    - {code: 4, meaning: network/transport error}

@@ -1,0 +1,94 @@
+generated: '2026-08-27'
+method: searched
+source: https://www.opensanctions.org/changelog/rss/
+docs: https://www.opensanctions.org/changelog/
+feed:
+  rss: https://www.opensanctions.org/changelog/rss/
+  status: 200
+  total_items: 40
+scheme:
+  style: dated-numbered-notices
+  note: >-
+    Not release notes for a versioned artifact — each entry is a numbered CHANGE
+    NOTICE (/changelog/<n>/) with a publication date and, for breaking changes, a
+    forward EFFECTIVE date. Several entries in the feed are announcements of changes
+    that have not landed yet, which is what makes this changelog usable as an early
+    warning system rather than a history.
+current_version: null
+entries:
+  - id: 46
+    date: '2026-06-26'
+    effective: '2027-01-18'
+    title: Retiring `name-based` and `name-qualified` matching algorithms
+    type: breaking
+    url: https://www.opensanctions.org/changelog/46/
+  - id: 45
+    date: '2026-06-22'
+    title: HTTP redirects from data.opensanctions.org to immutable /artifacts/ locations
+    type: breaking
+    url: https://www.opensanctions.org/changelog/45/
+  - id: 44
+    date: '2026-06-09'
+    title: Removal of `id` statements from the API
+    type: change
+    url: https://www.opensanctions.org/changelog/44/
+  - id: 43
+    date: '2026-05-28'
+    title: 'Dataset removal: Lithuania PEPs (register of private interests)'
+    type: breaking
+    url: https://www.opensanctions.org/changelog/43/
+  - id: 42
+    date: '2026-03-24'
+    title: Upgrade to Elasticsearch 9 (on-premise yente deployments)
+    type: breaking
+    url: https://www.opensanctions.org/changelog/42/
+  - id: 41
+    date: '2026-03-19'
+    title: 'Turning `iso9362_bic` into an enrichment dataset: `ext_iso9362_bic`'
+    type: breaking
+    url: https://www.opensanctions.org/changelog/41/
+  - id: 40
+    date: '2026-02-25'
+    title: 'Format change: `statements.csv`'
+    type: change
+    url: https://www.opensanctions.org/changelog/40/
+  - id: 39
+    date: '2026-02-25'
+    title: 'New property: `abbreviation`'
+    type: addition
+    url: https://www.opensanctions.org/changelog/39/
+  - id: 38
+    date: '2025-12-11'
+    title: UK sanctions lists consolidation (`gb_hmt_sanctions` -> `gb_fcdo_sanctions`)
+    type: breaking
+    url: https://www.opensanctions.org/changelog/38/
+  - id: 37
+    date: '2025-11-13'
+    title: Migration of billing system to Stripe
+    type: change
+    url: https://www.opensanctions.org/changelog/37/
+  - id: 36
+    date: '2025-10-30'
+    title: Demotion of name translations from `name` to `alias` in the EU FSF list
+    type: change
+    url: https://www.opensanctions.org/changelog/36/
+  - id: 35
+    date: '2025-09-17'
+    title: Adopt `logic-v2` as the API default result scoring algorithm
+    type: change
+    url: https://www.opensanctions.org/changelog/35/
+  - id: 34
+    date: '2025-09-12'
+    title: 'SUSPENDED: Removal of the `cutoff` parameter to the /match endpoint'
+    type: withdrawn
+    url: https://www.opensanctions.org/changelog/34/
+  - id: 33
+    date: '2025-09-09'
+    title: Removal of hardcoded sanction program names
+    type: change
+    url: https://www.opensanctions.org/changelog/33/
+  - id: 32
+    date: '2025-09-02'
+    title: 'API Service: Backend Upgrades'
+    type: change
+    url: https://www.opensanctions.org/changelog/32/

@@ -1,0 +1,308 @@
+openapi: 3.2.0
+info:
+  title: OpenSanctions System information API
+  description: '## Introduction
+
+
+    The OpenSanctions API allows users to search and query
+
+    the OpenSanctions entity graph.'
+  termsOfService: https://www.opensanctions.org/docs/terms
+  contact:
+    name: OpenSanctions
+    url: https://www.opensanctions.org/
+    email: info@opensanctions.org
+  version: yente 5.5.0
+  x-logo:
+    url: https://assets.opensanctions.org/images/ura/logo_text_spaced.svg
+  externalDocs:
+    description: Home page
+    url: https://www.opensanctions.org
+tags:
+- name: System Information
+  description: Service metadata endpoints for health checking and getting the application metadata to be used in client applications.
+paths:
+  /healthz:
+    get:
+      tags:
+      - System Information
+      summary: Health check
+      description: 'No-op basic health check. This is used by cluster management systems like
+
+        Kubernetes to verify the service is responsive.'
+      operationId: healthz_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '500':
+          description: Service is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /readyz:
+    get:
+      tags:
+      - System Information
+      summary: Search index readiness check
+      description: 'Search index health check. This is used to know if the service has completed
+
+        its index building.'
+      operationId: readyz_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '503':
+          description: Index is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /algorithms:
+    get:
+      tags:
+      - System Information
+      summary: Algorithms
+      description: 'Return a list of the supported matching/scoring algorithms used by the matching
+
+        endpoint.
+
+
+        See also the scoring documentation.'
+      operationId: algorithms_algorithms_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlgorithmResponse'
+  /updatez:
+    post:
+      tags:
+      - System Information
+      summary: Force an index update
+      description: 'Force the index to be re-generated. Works only if the update token is provided
+
+        (serves as an API key, and can be set in the container environment).'
+      operationId: force_update_updatez_post
+      parameters:
+      - name: token
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Update token for authentication
+          default: ''
+      - name: sync
+        in: query
+        required: false
+        schema:
+          type: boolean
+          title: Wait until indexing is complete
+          default: false
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '403':
+          description: Authorization error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    StatusResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: StatusResponse
+    ConfigVarType:
+      type: string
+      enum:
+      - string
+      - integer
+      - float
+      - boolean
+      title: ConfigVarType
+      description: The type of a configuration variable.
+    AlgorithmDocs:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        config:
+          additionalProperties:
+            $ref: '#/components/schemas/ConfigVar'
+          type: object
+          title: Config
+        features:
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureDoc'
+          type: object
+          title: Features
+      type: object
+      required:
+      - name
+      - config
+      - features
+      title: AlgorithmDocs
+      description: Documentation for a scoring algorithm.
+    ConfigVar:
+      properties:
+        type:
+          $ref: '#/components/schemas/ConfigVarType'
+          default: float
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        default:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: number
+          - type: boolean
+          - type: 'null'
+          title: Default
+          default: 0
+      type: object
+      title: ConfigVar
+      description: A configuration variable for a scoring algorithm.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    FeatureDoc:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        coefficient:
+          type: number
+          title: Coefficient
+        url:
+          type: string
+          title: Url
+      type: object
+      required:
+      - description
+      - coefficient
+      - url
+      title: FeatureDoc
+      description: Documentation for a particular feature in the matching API model.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Algorithm:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        features:
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureDoc'
+          type: object
+          title: Features
+          description: Deprecated, use `docs` instead
+          deprecated: true
+        docs:
+          $ref: '#/components/schemas/AlgorithmDocs'
+      type: object
+      required:
+      - name
+      - features
+      - docs
+      title: Algorithm
+    AlgorithmResponse:
+      properties:
+        algorithms:
+          items:
+            $ref: '#/components/schemas/Algorithm'
+          type: array
+          title: Algorithms
+        default:
+          type: string
+          title: Default
+        best:
+          type: string
+          title: Best
+      type: object
+      required:
+      - algorithms
+      - default
+      - best
+      title: AlgorithmResponse

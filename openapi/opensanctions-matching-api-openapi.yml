@@ -1,0 +1,911 @@
+openapi: 3.2.0
+info:
+  title: OpenSanctions Matching API
+  description: '## Introduction
+
+
+    The OpenSanctions API allows users to search and query
+
+    the OpenSanctions entity graph.'
+  termsOfService: https://www.opensanctions.org/docs/terms
+  contact:
+    name: OpenSanctions
+    url: https://www.opensanctions.org/
+    email: info@opensanctions.org
+  version: yente 5.5.0
+  x-logo:
+    url: https://assets.opensanctions.org/images/ura/logo_text_spaced.svg
+  externalDocs:
+    description: Home page
+    url: https://www.opensanctions.org
+tags:
+- name: Matching
+  description: Endpoints for conducting a user-facing entity search or matching a local data store against the given dataset.
+  externalDocs:
+    description: Data dictionary
+    url: https://opensanctions.org/reference/
+paths:
+  /match/{dataset}:
+    post:
+      tags:
+      - Matching
+      summary: Query by example matcher
+      description: 'Match entities based on a complex set of criteria, like name, date of birth
+
+        and nationality of a person. This works by submitting a batch of entities, each
+
+        formatted like those returned by the API.
+
+
+        Tutorials:
+
+        * Using the matching API
+
+        * Configuring the scoring system
+
+
+        For example, the following would be valid query examples:
+
+
+        ```json
+
+        "queries": {
+
+        "entity1": {
+
+        "schema": "Person",
+
+        "properties": {
+
+        "name": ["John Doe"],
+
+        "birthDate": ["1975-04-21"],
+
+        "nationality": ["us"]
+
+        }
+
+        },
+
+        "entity2": {
+
+        "schema": "Company",
+
+        "properties": {
+
+        "name": ["Brilliant Amazing Limited"],
+
+        "jurisdiction": ["hk"],
+
+        "registrationNumber": ["84BA99810"]
+
+        }
+
+        }
+
+        }
+
+        ```
+
+        The values for `entity1`, `entity2` can be chosen freely to correlate results
+
+        on the client side when the request is returned. The responses will be given
+
+        for each submitted example like this:
+
+
+        ```json
+
+        "responses": {
+
+        "entity1": {
+
+        "query": {},
+
+        "results": [...]
+
+        },
+
+        "entity2": {
+
+        "query": {},
+
+        "results": [...]
+
+        }
+
+        }
+
+        ```
+
+
+        The precision of the results will be dependent on the amount of detail submitted
+
+        with each example. The following properties are most helpful for particular types:
+
+
+        * **Person**: ``name``, ``birthDate``, ``nationality``, ``idNumber``, ``address``
+
+        * **Organization**: ``name``, ``country``, ``registrationNumber``, ``address``
+
+        * **Company**: ``name``, ``jurisdiction``, ``registrationNumber``, ``address``,
+
+        ``incorporationDate``'
+      operationId: match_match__dataset__post
+      parameters:
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Data source or collection name to scope the query to.
+          examples:
+          - default
+          title: Dataset
+        description: Data source or collection name to scope the query to.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          title: Number of results to return
+          default: 5
+      - name: threshold
+        in: query
+        required: false
+        schema:
+          type: number
+          title: Score threshold for results to be considered matches
+          default: 0.7
+      - name: cutoff
+        in: query
+        required: false
+        schema:
+          type: number
+          title: Deprecated, use `threshold` instead. Lower bound of score for results to be returned at all
+          deprecated: true
+          default: 0.7
+        deprecated: true
+      - name: algorithm
+        in: query
+        required: false
+        schema:
+          type: string
+          title: 'Scoring algorithm to use, currently "best" is defined as logic-v2, options: logic-v2, ofac, name-based, name-qualified, logic-v1, regression-v1'
+          default: best
+      - name: include_dataset
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Only include the given datasets in results
+          default: []
+      - name: exclude_schema
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Remove the given types of entities from results
+          default: []
+      - name: exclude_dataset
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Remove the given datasets from results
+          default: []
+      - name: topics
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Only return results that match any of the given topics
+          default: []
+      - name: changed_since
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}(:\d{2}(:\d{2})?)?)?$
+          - type: 'null'
+          title: Match against entities that were updated since the given date
+      - name: exclude_entity_ids
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          maxItems: 50
+          title: A list of entities IDs to exclude from matching
+          description: The entity IDs supplied here do not have to be canonical. Supplying any of the referents of a merged entity will exclude that entity. This parameter may be useful for example to exclude false-positive matches that have been decided upon by a human.
+          default: []
+        description: The entity IDs supplied here do not have to be canonical. Supplying any of the referents of a merged entity will exclude that entity. This parameter may be useful for example to exclude false-positive matches that have been decided upon by a human.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntityMatchQuery'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityMatchResponse'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /search/{dataset}:
+    get:
+      tags:
+      - Matching
+      summary: Simple entity search
+      description: 'Search endpoint for matching entities based on a simple piece of text, e.g.
+
+        a name. This can be used to implement a simple, user-facing search. For proper
+
+        entity matching, the multi-property matching API should be used instead.
+
+
+        Search queries can include field-specific fitlers, wildcards and fuzzy searches.
+
+        See also: search API documentation.'
+      operationId: search_search__dataset__get
+      parameters:
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          description: Data source or collection name to scope the query to.
+          examples:
+          - default
+          title: Dataset
+        description: Data source or collection name to scope the query to.
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Query text
+          default: ''
+      - name: schema
+        in: query
+        required: false
+        schema:
+          type: string
+          title: Types of entities that can match the search
+          default: Thing
+      - name: include_dataset
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Restrict the search scope to datasets (that are in the given scope) to search entities within.
+          description: Limit the results to entities that are part of at least one of the given datasets.
+          default: []
+        description: Limit the results to entities that are part of at least one of the given datasets.
+      - name: exclude_dataset
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Remove specific datasets (that are in the given scope) from the search scope.
+          default: []
+      - name: exclude_schema
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Remove the given types of entities from results
+          default: []
+      - name: changed_since
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}(:\d{2}(:\d{2})?)?)?$
+          - type: 'null'
+          title: Search entities that were updated since the given date
+      - name: countries
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Filter by country codes
+          default: []
+      - name: topics
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Filter by entity topics (e.g. sanction, role.pep)
+          default: []
+      - name: datasets
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Filter by dataset names, for faceting use (respects operator choice).
+          default: []
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Filter by entity properties (e.g. programId, birthDate)
+          description: Use the syntax `field:value` to filter on a specific field. Properties are indexed as fields named `properties.birthDate:1985`.
+          default: []
+        description: Use the syntax `field:value` to filter on a specific field. Properties are indexed as fields named `properties.birthDate:1985`.
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          title: Number of results to return
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 9499
+          title: Start at result with given offset
+          default: 0
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+          title: Sorting criteria
+          default: []
+      - name: target
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Include only targeted entities
+          description: Please specify a list of topics of concern, instead.
+          deprecated: true
+        description: Please specify a list of topics of concern, instead.
+        deprecated: true
+      - name: fuzzy
+        in: query
+        required: false
+        schema:
+          type: boolean
+          title: Allow fuzzy query syntax
+          default: false
+      - name: simple
+        in: query
+        required: false
+        schema:
+          type: boolean
+          title: Use simple syntax for user-facing query boxes
+          default: false
+      - name: facets
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/Facet'
+          title: Facet counts to include in response.
+          default:
+          - countries
+          - topics
+          - datasets
+      - name: filter_op
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Operator'
+          title: Define behaviour of multiple filters on one field
+          description: Logic to use when combining multiple filters on the same field (topics, countries, datasets). Please specify AND for new integrations (to override a legacy default) and when building a faceted user interface.
+          default: OR
+        description: Logic to use when combining multiple filters on the same field (topics, countries, datasets). Please specify AND for new integrations (to override a legacy default) and when building a faceted user interface.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    FeatureResult:
+      properties:
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+        score:
+          type: number
+          title: Score
+        query:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+        candidate:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Candidate
+      type: object
+      required:
+      - detail
+      - score
+      title: FeatureResult
+      description: A explained score for a particular feature result.
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    EntityResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+          examples:
+          - NK-A7z....
+        caption:
+          type: string
+          title: Caption
+          examples:
+          - John Doe
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - LegalEntity
+        properties:
+          additionalProperties:
+            items:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/EntityResponse'
+            type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+        datasets:
+          items:
+            type: string
+          type: array
+          title: Datasets
+          default: []
+          examples:
+          - - us_ofac_sdn
+        referents:
+          items:
+            type: string
+          type: array
+          title: Referents
+          default: []
+          examples:
+          - - ofac-1234
+        target:
+          type: boolean
+          title: Target
+          default: false
+        first_seen:
+          title: First Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_seen:
+          title: Last Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_change:
+          title: Last Change
+          examples:
+          - '2026-01-01T12:00:00Z'
+      type: object
+      required:
+      - id
+      - caption
+      - schema
+      - properties
+      title: EntityResponse
+    SearchFacet:
+      properties:
+        label:
+          type: string
+          title: Label
+          examples:
+          - Countries
+        values:
+          items:
+            $ref: '#/components/schemas/SearchFacetItem'
+          type: array
+          title: Values
+      type: object
+      required:
+      - label
+      - values
+      title: SearchFacet
+    Facet:
+      type: string
+      enum:
+      - datasets
+      - schema
+      - countries
+      - identifiers
+      - topics
+      - genders
+      title: Facet
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    SearchResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            $ref: '#/components/schemas/EntityResponse'
+          type: array
+          title: Results
+        facets:
+          additionalProperties:
+            $ref: '#/components/schemas/SearchFacet'
+          type: object
+          title: Facets
+      type: object
+      required:
+      - limit
+      - total
+      - results
+      - facets
+      title: SearchResponse
+    EntityMatches:
+      properties:
+        status:
+          type: integer
+          title: Status
+          default: 200
+          examples:
+          - 200
+        results:
+          items:
+            $ref: '#/components/schemas/ScoredEntityResponse'
+          type: array
+          title: Results
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        query:
+          $ref: '#/components/schemas/EntityExample'
+      type: object
+      required:
+      - results
+      - total
+      - query
+      title: EntityMatches
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    SearchFacetItem:
+      properties:
+        name:
+          type: string
+          title: Name
+          examples:
+          - ru
+        label:
+          type: string
+          title: Label
+          examples:
+          - Russia
+        count:
+          type: integer
+          title: Count
+          default: 1
+          examples:
+          - 42
+      type: object
+      required:
+      - name
+      - label
+      title: SearchFacetItem
+    TotalSpec:
+      properties:
+        value:
+          type: integer
+          title: Value
+          examples:
+          - 42
+        relation:
+          type: string
+          title: Relation
+          default: eq
+          examples:
+          - eq
+      type: object
+      required:
+      - value
+      title: TotalSpec
+    EntityExample:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          examples:
+          - my-entity-id
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - Person
+        properties:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - items: {}
+              type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+      type: object
+      required:
+      - schema
+      - properties
+      title: EntityExample
+    Operator:
+      type: string
+      enum:
+      - AND
+      - OR
+      title: Operator
+    ScoredEntityResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+          examples:
+          - NK-A7z....
+        caption:
+          type: string
+          title: Caption
+          examples:
+          - John Doe
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - LegalEntity
+        properties:
+          additionalProperties:
+            items:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/EntityResponse'
+            type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+        datasets:
+          items:
+            type: string
+          type: array
+          title: Datasets
+          default: []
+          examples:
+          - - us_ofac_sdn
+        referents:
+          items:
+            type: string
+          type: array
+          title: Referents
+          default: []
+          examples:
+          - - ofac-1234
+        target:
+          type: boolean
+          title: Target
+          default: false
+        first_seen:
+          title: First Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_seen:
+          title: Last Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_change:
+          title: Last Change
+          examples:
+          - '2026-01-01T12:00:00Z'
+        score:
+          type: number
+          title: Score
+          default: 0.99
+        explanations:
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureResult'
+          type: object
+          title: Explanations
+          description: A dictionary of subscores from features in the algorithm and explanations for how they were calculated.
+        match:
+          type: boolean
+          title: Match
+          description: Whether the score is above the match threshold.
+      type: object
+      required:
+      - id
+      - caption
+      - schema
+      - properties
+      - explanations
+      - match
+      title: ScoredEntityResponse
+    EntityMatchQuery:
+      properties:
+        weights:
+          additionalProperties:
+            type: number
+          type: object
+          title: Weights
+          default: {}
+          examples:
+          - name_literal: 0.8
+        config:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: 'null'
+          type: object
+          title: Config
+          description: Algorithm-specific configuration parameters.
+          examples:
+          - nm_number_mismatch: 0.4
+        queries:
+          additionalProperties:
+            $ref: '#/components/schemas/EntityExample'
+          type: object
+          title: Queries
+      type: object
+      required:
+      - queries
+      title: EntityMatchQuery
+    EntityMatchResponse:
+      properties:
+        responses:
+          additionalProperties:
+            $ref: '#/components/schemas/EntityMatches'
+          type: object
+          title: Responses
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 5
+      type: object
+      required:
+      - responses
+      - limit
+      title: EntityMatchResponse

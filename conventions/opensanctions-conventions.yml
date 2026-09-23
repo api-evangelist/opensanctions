@@ -1,0 +1,148 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  openapi/opensanctions-api-openapi.yml , https://www.opensanctions.org/docs/api/ ,
+  https://www.opensanctions.org/docs/api/request/ ,
+  https://www.opensanctions.org/docs/api/faq/ , and live response-header probes of
+  api.opensanctions.org on 2026-08-27
+base_url: https://api.opensanctions.org
+authentication:
+  style: api-key-header
+  header: "Authorization: ApiKey <key>"
+  detail: authentication/opensanctions-authentication.yml
+idempotency:
+  supported: na
+  header: null
+  note: >-
+    NOT APPLICABLE — this is a read-only query API. Every data operation is a lookup:
+    GET /search, GET /entities, GET /statements, GET /catalog, GET /algorithms, and
+    even POST /match, which is a POST only because the query-by-example batch does
+    not fit in a URL. The one true write, POST /updatez, forces a search-index
+    refresh on a self-hosted yente and is naturally idempotent (re-running it
+    re-runs the same refresh). There is nothing to double-charge or double-create,
+    so no idempotency key is offered and none is needed. No `Idempotency` pointer is
+    emitted in apis.yml — asserting one would claim a contract the provider neither
+    ships nor owes.
+pagination:
+  style: limit-offset
+  params:
+    limit: {default_search: 10, default_statements: 50, default_match: 5, max_match: 500}
+    offset: {default: 0}
+  response_fields: [limit, offset, total, results]
+  total_shape:
+    schema: TotalSpec
+    fields: [value, relation]
+    note: >-
+      `total` is not a bare integer: it is {value, relation}, where relation
+      distinguishes an exact count from a lower bound (Elasticsearch semantics).
+      A client that reads total as a number will mis-page deep result sets.
+  applies_to:
+    - search_search__dataset__get
+    - statements_statements_get
+    - Fetch_Adjacent_Entities__entities__entity_id__adjacent_get
+    - Fetch_Adjacent_by_Property__entities__entity_id__adjacent__property_name__get
+  note: >-
+    /entities/{id}/adjacent applies `limit` PER PROPERTY, not per response — a
+    documented departure from the same parameter's meaning on /search.
+filtering_and_sorting:
+  filter_params: [countries, topics, datasets, filter, schema, exclude_schema, include_dataset, exclude_dataset, target, changed_since]
+  filter_operator: {param: filter_op, default: 'OR', note: controls multi-filter behaviour on one field}
+  sort: {param: sort, style: array of sorting criteria}
+  faceting: {param: facets, default: [countries, topics, datasets]}
+  incremental: >-
+    `changed_since` (ISO date/datetime) on /search is the incremental-polling hook;
+    the documented continuous-monitoring workflow is at
+    https://www.opensanctions.org/docs/monitoring/ .
+field_expansion:
+  supported: true
+  param: nested
+  default: true
+  applies_to: [fetch_entity_entities__entity_id__get]
+  note: >-
+    `nested=true` inlines adjacent entities (addresses, family, sanctions) into the
+    entity payload; `nested=false` returns the flat form. Documented at
+    https://www.opensanctions.org/docs/nested-entities/ .
+caching:
+  conditional_requests: true
+  headers_observed: [etag, 'cache-control: public, max-age=300']
+  status: 304
+  applies_to: [catalog_catalog_get]
+  note: >-
+    /catalog is ~1.7 MB; the spec declares a 304 "The catalog has not changed"
+    response and the live endpoint returns a strong ETag. Clients polling dataset
+    freshness should send If-None-Match.
+request_tracing:
+  supported: true
+  standard: W3C Trace Context
+  headers_observed: [traceparent, tracestate, x-cloud-trace-context]
+  example_tracestate: 'yente=1078aef400fd3c04'
+  note: >-
+    The API emits a W3C `traceparent` on every response and a `tracestate` naming
+    the yente service — a correlation ID for support without a proprietary
+    X-Request-Id. No request-id header is documented for clients to SEND.
+user_agent:
+  convention: >-
+    The first-party SDK adds an `app_name` comment to the User-Agent
+    (yente-client `app_name=` kwarg). The provider asks automated clients to
+    identify themselves rather than scraping the website search.
+versioning:
+  scheme: unversioned-path
+  detail: lifecycle/opensanctions-lifecycle.yml
+error_envelope:
+  shape: '{"detail": "<message>"}'
+  validation_shape: '{"detail": [{"loc": [...], "msg": "...", "type": "..."}]}'
+  rfc9457: false
+  detail: errors/opensanctions-problem-types.yml
+rate_limit_signaling:
+  headers: []
+  status_on_exhaustion: 429
+  note: >-
+    NO runtime rate-limit signal. No X-RateLimit-*, no RateLimit-*, no Retry-After
+    observed on live responses. Quota is monthly and is only discoverable by being
+    rejected with a 429 that persists until the next calendar month. Detail in
+    rate-limits/opensanctions-rate-limits.yml .
+  detail: rate-limits/opensanctions-rate-limits.yml
+redirects:
+  status: 308
+  meaning: >-
+    Entity IDs are stable but mergeable — a de-duplicated entity 308-redirects to
+    its canonical ID. HTTP clients must follow 308 on /entities/* or silently lose
+    records.
+reversibility:
+  applicable: na
+  grade: na
+  write_surface: false
+  reversal_operations: []
+  note: >-
+    NOT APPLICABLE, and that is the honest answer rather than a zero. The public
+    OpenSanctions API creates, mutates and destroys nothing on the caller's behalf:
+    11 of 12 operations are reads, and POST /match is a read expressed as a POST.
+    There is no order, no charge, no record written, therefore no cancel, refund,
+    void or restore to document and no window to state. The one write in the spec,
+    POST /updatez, triggers a search-index rebuild on a SELF-HOSTED yente instance;
+    it is operator-initiated, affects only that operator's own index, and is
+    "reversed" by the next scheduled update rather than by an API call — no
+    reversal operation is published and none is claimed here.
+    Commercial reversibility (cancelling the API subscription) is contractual, not
+    an API surface: "two weeks' notice to the end of the month"
+    (https://www.opensanctions.org/docs/terms/api/), recorded in
+    lifecycle/opensanctions-lifecycle.yml .
+dry_run_mode:
+  supported: na
+  note: >-
+    NA for the same reason as reversibility — a read-only API has nothing to
+    rehearse. The nearest equivalent is the free/unbilled tier of endpoints:
+    /entities and /statements are not billed, and non-2xx responses are never
+    billed, so an agent can explore the graph without metering cost.
+cross_links:
+  authentication: authentication/opensanctions-authentication.yml
+  errors: errors/opensanctions-problem-types.yml
+  lifecycle: lifecycle/opensanctions-lifecycle.yml
+  rate_limits: rate-limits/opensanctions-rate-limits.yml
+  data_model: data-model/opensanctions-data-model.yml
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://api.opensanctions.org/catalog', status: 200, note: 'etag + cache-control: public, max-age=300'}
+    - {url: 'https://api.opensanctions.org/healthz', status: 200, note: 'traceparent + tracestate present; no rate-limit headers'}
+    - {url: 'https://api.opensanctions.org/search/default?q=test', status: 401, note: '{"detail":"No API key provided."} ; no rate-limit headers'}

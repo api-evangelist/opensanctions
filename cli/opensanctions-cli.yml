@@ -1,0 +1,73 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://raw.githubusercontent.com/opensanctions/yente-client/refs/heads/main/python/README.md
+  and https://yenteclient.followthemoney.tech/
+name: yente-cli
+official: true
+package: yente-client
+version: 0.2.0
+published: '2026-07-23'
+repository: https://github.com/opensanctions/yente-client
+docs: https://yenteclient.followthemoney.tech/
+install:
+  - "pip install 'yente-client[cli]'"
+auth:
+  env_var: OPENSANCTIONS_API_KEY
+  flag: --api-key
+  note: >-
+    Reference commands (`yente-cli ref ...`) run entirely offline against the
+    bundled FtM model and need no API key at all.
+output_formats:
+  - {flag: '-f table', note: default on a TTY}
+  - {flag: '-f json', note: pretty; default when piped}
+  - {flag: '-f jsonl', note: one item per line — intended for jq and LLM pipelines}
+commands:
+  - group: screening
+    commands:
+      - name: match
+        example: yente-cli match -s Person -p firstName=Aleksandr -p lastName=Zacharov -d sanctions
+        api_operation: match_match__dataset__post
+      - name: search
+        example: yente-cli search "acme" -d default -s Company
+        api_operation: search_search__dataset__get
+      - name: fetch
+        example: yente-cli fetch NK-aU5ybkbRFJucf8YMwsJvDw
+        api_operation: fetch_entity_entities__entity_id__get
+  - group: reference (offline, no API key)
+    commands:
+      - {name: 'ref schemas', note: all FtM schemas with matchable flags}
+      - {name: 'ref schema <Name>', note: 'full property list, types, deprecation'}
+      - {name: 'ref topics', note: the Topic enum}
+      - {name: 'ref countries', note: country codes the server speaks}
+  - group: server state
+    commands:
+      - {name: status, note: 'client + server + auth + loaded datasets'}
+      - {name: datasets, api_operation: catalog_catalog_get}
+      - {name: programs, note: sanctions programs behind programId codes}
+      - {name: algorithms, api_operation: algorithms_algorithms_get}
+exit_codes:
+  - {code: 0, meaning: one or more results}
+  - {code: 1, meaning: zero results — lets shell scripts gate on '&&'}
+  - {code: 2, meaning: usage error (bad flag, unknown schema/property)}
+  - {code: 3, meaning: API error (4xx, 5xx)}
+  - {code: 4, meaning: network/transport error}
+agent_affordances:
+  note: >-
+    Explicitly designed for LLM agents, per the provider: every command's --help
+    carries worked examples and documented JSON output shapes; unknown schema or
+    property names return fuzzy suggestions ("Did you mean `birthDate`?"); `-f jsonl`
+    is offered for agent pipelines. The distinct exit codes for "zero results" (1)
+    versus "usage error" (2) versus "API error" (3) let a script tell "screened
+    clean" apart from "the call failed" — the distinction that matters most in a
+    compliance workflow, and one most CLIs collapse.
+guidance:
+  match_vs_search: >-
+    Provider guidance, verbatim in intent: use `match` for any matching task, even
+    with partial input — it returns scored, ranked candidates. `search` is for
+    user-facing search UIs, not a fallback for `match` on sparse input.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://raw.githubusercontent.com/opensanctions/yente-client/refs/heads/main/python/README.md', status: 200}
+    - {url: 'https://pypi.org/pypi/yente-client/json', status: 200}

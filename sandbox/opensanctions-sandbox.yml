@@ -1,0 +1,84 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://www.opensanctions.org/docs/on-premise/ , https://yente.followthemoney.tech/ ,
+  https://www.opensanctions.org/api/ , https://www.opensanctions.org/docs/api/faq/ ,
+  https://www.opensanctions.org/docs/api/quickstart/
+sandbox_type: self-hosted-instance
+test_live_separation: false
+note: >-
+  OpenSanctions publishes NO test-mode key, no key prefix separating test from live,
+  and no magic test identifiers — and it would be misleading to invent any, because
+  the data IS the product: a "test" sanctions hit that is not a real designation
+  would be worse than useless. What the provider does publish instead is a genuine,
+  free, self-runnable copy of the whole API — yente, MIT-licensed, as a container —
+  plus a set of endpoints that are never metered. Those are the real rehearsal
+  surfaces and are recorded below.
+surfaces:
+  - name: Self-hosted yente
+    kind: full local instance
+    docs: https://yente.followthemoney.tech/
+    product_page: https://www.opensanctions.org/docs/on-premise/
+    repository: https://github.com/opensanctions/yente
+    image: ghcr.io/opensanctions/yente
+    license: MIT
+    auth: none required
+    note: >-
+      Serves the same OpenAPI contract as api.opensanctions.org. The first-party SDK
+      targets it with `Client(base_url="http://localhost:8000")` and no api_key, and
+      the MCP server with `YENTE_BASE_URL`. This is the closest thing to a sandbox
+      the provider ships, and it is a better one than most test modes because the
+      contract is identical rather than a simulation.
+  - name: Unmetered endpoints on the hosted API
+    kind: free production endpoints
+    operations: [fetch_entity_entities__entity_id__get, statements_statements_get]
+    note: >-
+      "/entities and /statements are free" per the metering FAQ, so an integration
+      can walk the graph and audit provenance without consuming query quota. Only
+      /match, /search and /reconcile are billed.
+  - name: Unauthenticated endpoints
+    kind: no key required
+    operations: [healthz_healthz_get, readyz_readyz_get, catalog_catalog_get]
+    probed:
+      - {url: 'https://api.opensanctions.org/healthz', status: 200}
+      - {url: 'https://api.opensanctions.org/catalog', status: 200}
+    note: >-
+      /catalog is fully open and returns all 477 datasets with freshness metadata —
+      enough to build and test dataset-selection logic before ever holding a key.
+  - name: Offline reference commands
+    kind: no network, no key
+    tool: yente-cli
+    commands: ['yente-cli ref schemas', 'yente-cli ref schema Person', 'yente-cli ref topics', 'yente-cli ref countries']
+    note: >-
+      The FtM model ships inside the client package, so schema/topic/country
+      discovery works with no API key and no network — the vocabulary half of an
+      integration can be built and tested entirely offline.
+  - name: 30-day trial key
+    kind: time-limited production key
+    signup: https://www.opensanctions.org/account/
+    requirements: registration with a business email address
+    note: >-
+      Real production data against real quota, not a sandbox — spend counts once the
+      trial converts.
+  - name: API console
+    kind: authenticated dashboard
+    url: https://www.opensanctions.org/account/
+    probed_status: 302
+    note: >-
+      Redirects to sign-in; the console is behind the account wall, so it could not
+      be inspected anonymously.
+test_values:
+  cards: []
+  identifiers: []
+  note: >-
+    None published, and none invented. The provider's public worked example is a
+    real screening query — Person firstName=Aleksandr lastName=Zacharov,
+    datasets=[sanctions] — reproduced verbatim from the SDK README, not a synthetic
+    fixture.
+x-evidence:
+  fetched: '2026-08-27'
+  probes:
+    - {url: 'https://www.opensanctions.org/docs/on-premise/', status: 200}
+    - {url: 'https://api.opensanctions.org/catalog', status: 200}
+    - {url: 'https://api.opensanctions.org/healthz', status: 200}
+    - {url: 'https://www.opensanctions.org/service/account/', status: 302}
