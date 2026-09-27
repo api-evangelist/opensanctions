@@ -17,14 +17,19 @@ description: >-
   licensed, and the API is metered at EUR 0.10 per query.
 deliveryModel:
   model: saas
-  open_source: false
+  license_evidence:
+    not_product:
+    - opensanctions/api-examples
+  open_source: unknown
   commercial: true
   callable_host: false
   label: Hosted service · you call their endpoint
-  confidence: medium
+  confidence: low
   source:
+  - openapi
   - pricing
-  generated: '2026-08-28'
+  - repository-not-product
+  generated: '2026-09-25'
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/opensanctions.png
 url: https://www.opensanctions.org/docs/api/
@@ -51,7 +56,7 @@ accessModel:
   method: searched
 tags:
   - Sanctions Screening
-  - Anti-Money Laundering
+  - AML
   - Politically Exposed Persons
   - Compliance
   - Financial Crime
@@ -61,7 +66,7 @@ tags:
   - Risk Data
   - Due Diligence
   - Public APIs
-  - agent-native
+  - Agent-Native
 tags_raw:
   - Sanctions Screening
   - Anti-Money Laundering

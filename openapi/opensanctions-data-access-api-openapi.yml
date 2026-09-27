@@ -398,55 +398,32 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    DataCoverage:
+    ValidationError:
       properties:
-        start:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Start
-        end:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: End
-        countries:
+        loc:
           items:
-            type: string
+            anyOf:
+            - type: string
+            - type: integer
           type: array
-          title: Countries
-          default: []
-        frequency:
+          title: Location
+        msg:
           type: string
-          enum:
-          - unknown
-          - never
-          - hourly
-          - daily
-          - weekly
-          - monthly
-          - annually
-          title: Frequency
-          default: unknown
-        schedule:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Schedule
-      type: object
-      title: DataCoverage
-      description: Details on the temporal and geographic scope of a dataset.
-    ErrorResponse:
-      properties:
-        detail:
+          title: Message
+        type:
           type: string
-          title: Detail
-          examples:
-          - Detailed error message
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
       required:
-      - detail
-      title: ErrorResponse
+      - loc
+      - msg
+      - type
+      title: ValidationError
     EntityResponse:
       properties:
         id:
@@ -515,200 +492,6 @@ components:
       - schema
       - properties
       title: EntityResponse
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    EntityAdjacentResponse:
-      properties:
-        entity:
-          $ref: '#/components/schemas/EntityResponse'
-        adjacent:
-          additionalProperties:
-            $ref: '#/components/schemas/AdjacentResultsResponse'
-          type: object
-          title: Adjacent
-      type: object
-      required:
-      - entity
-      - adjacent
-      title: EntityAdjacentResponse
-    YenteDatasetModel:
-      properties:
-        name:
-          type: string
-          title: Name
-        title:
-          type: string
-          title: Title
-        license:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: License
-        summary:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Summary
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Url
-        updated_at:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Updated At
-        last_export:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Last Export
-        entity_count:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Entity Count
-        thing_count:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Thing Count
-        version:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Version
-        category:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Category
-        tags:
-          items:
-            type: string
-          type: array
-          title: Tags
-          default: []
-        publisher:
-          anyOf:
-          - $ref: '#/components/schemas/DataPublisher'
-          - type: 'null'
-        coverage:
-          anyOf:
-          - $ref: '#/components/schemas/DataCoverage'
-          - type: 'null'
-        resources:
-          items:
-            $ref: '#/components/schemas/DataResource'
-          type: array
-          title: Resources
-          default: []
-        children:
-          items:
-            type: string
-          type: array
-          uniqueItems: true
-          title: Children
-          default: []
-        deprecation:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Deprecation
-        deprecated:
-          type: boolean
-          title: Deprecated
-          default: false
-        load:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Load
-        entities_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Entities Url
-        delta_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Delta Url
-        namespace:
-          type: boolean
-          title: Namespace
-          default: false
-        index_version:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Index Version
-        index_current:
-          type: boolean
-          title: Index Current
-          readOnly: true
-      type: object
-      required:
-      - name
-      - title
-      - index_current
-      title: YenteDatasetModel
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    TotalSpec:
-      properties:
-        value:
-          type: integer
-          title: Value
-          examples:
-          - 42
-        relation:
-          type: string
-          title: Relation
-          default: eq
-          examples:
-          - eq
-      type: object
-      required:
-      - value
-      title: TotalSpec
     Statement:
       properties:
         id:
@@ -894,45 +677,44 @@ components:
       - country_label
       title: DataPublisher
       description: Publisher information, eg. the government authority.
-    AdjacentResultsResponse:
+    DataCoverage:
       properties:
-        limit:
-          type: integer
-          title: Limit
-          examples:
-          - 20
-        offset:
-          type: integer
-          title: Offset
-          default: 0
-          examples:
-          - 0
-        total:
-          $ref: '#/components/schemas/TotalSpec'
-        results:
+        start:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End
+        countries:
           items:
-            anyOf:
-            - type: string
-            - $ref: '#/components/schemas/EntityResponse'
+            type: string
           type: array
-          title: Results
+          title: Countries
           default: []
-          examples:
-          - - id: ds-abc-own-123
-              properties:
-                asset:
-                - caption: Company 1 Ltd.
-                  id: NK-1234
-                  properties:
-                    name:
-                    - Company 1 Ltd.
-                  schema: Comany
-              schema: Ownership
+        frequency:
+          type: string
+          enum:
+          - unknown
+          - never
+          - hourly
+          - daily
+          - weekly
+          - monthly
+          - annually
+          title: Frequency
+          default: unknown
+        schedule:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Schedule
       type: object
-      required:
-      - limit
-      - total
-      title: AdjacentResultsResponse
+      title: DataCoverage
+      description: Details on the temporal and geographic scope of a dataset.
     DataCatalogModel:
       properties:
         datasets:
@@ -986,3 +768,221 @@ components:
       - total
       - results
       title: StatementResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    YenteDatasetModel:
+      properties:
+        name:
+          type: string
+          title: Name
+        title:
+          type: string
+          title: Title
+        license:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: License
+        summary:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Summary
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        updated_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated At
+        last_export:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Export
+        entity_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Entity Count
+        thing_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Thing Count
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        category:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+          default: []
+        publisher:
+          anyOf:
+          - $ref: '#/components/schemas/DataPublisher'
+          - type: 'null'
+        coverage:
+          anyOf:
+          - $ref: '#/components/schemas/DataCoverage'
+          - type: 'null'
+        resources:
+          items:
+            $ref: '#/components/schemas/DataResource'
+          type: array
+          title: Resources
+          default: []
+        children:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+          title: Children
+          default: []
+        deprecation:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Deprecation
+        deprecated:
+          type: boolean
+          title: Deprecated
+          default: false
+        load:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Load
+        entities_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Entities Url
+        delta_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Delta Url
+        namespace:
+          type: boolean
+          title: Namespace
+          default: false
+        index_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Index Version
+        index_current:
+          type: boolean
+          title: Index Current
+          readOnly: true
+      type: object
+      required:
+      - name
+      - title
+      - index_current
+      title: YenteDatasetModel
+    AdjacentResultsResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            anyOf:
+            - type: string
+            - $ref: '#/components/schemas/EntityResponse'
+          type: array
+          title: Results
+          default: []
+          examples:
+          - - id: ds-abc-own-123
+              properties:
+                asset:
+                - caption: Company 1 Ltd.
+                  id: NK-1234
+                  properties:
+                    name:
+                    - Company 1 Ltd.
+                  schema: Comany
+              schema: Ownership
+      type: object
+      required:
+      - limit
+      - total
+      title: AdjacentResultsResponse
+    TotalSpec:
+      properties:
+        value:
+          type: integer
+          title: Value
+          examples:
+          - 42
+        relation:
+          type: string
+          title: Relation
+          default: eq
+          examples:
+          - eq
+      type: object
+      required:
+      - value
+      title: TotalSpec
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    EntityAdjacentResponse:
+      properties:
+        entity:
+          $ref: '#/components/schemas/EntityResponse'
+        adjacent:
+          additionalProperties:
+            $ref: '#/components/schemas/AdjacentResultsResponse'
+          type: object
+          title: Adjacent
+      type: object
+      required:
+      - entity
+      - adjacent
+      title: EntityAdjacentResponse

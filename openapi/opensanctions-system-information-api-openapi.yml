@@ -130,25 +130,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ErrorResponse:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          examples:
-          - Detailed error message
-      type: object
-      required:
-      - detail
-      title: ErrorResponse
-    StatusResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-          default: ok
-      type: object
-      title: StatusResponse
     ConfigVarType:
       type: string
       enum:
@@ -158,6 +139,101 @@ components:
       - boolean
       title: ConfigVarType
       description: The type of a configuration variable.
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    AlgorithmResponse:
+      properties:
+        algorithms:
+          items:
+            $ref: '#/components/schemas/Algorithm'
+          type: array
+          title: Algorithms
+        default:
+          type: string
+          title: Default
+        best:
+          type: string
+          title: Best
+      type: object
+      required:
+      - algorithms
+      - default
+      - best
+      title: AlgorithmResponse
+    StatusResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: StatusResponse
+    FeatureDoc:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        coefficient:
+          type: number
+          title: Coefficient
+        url:
+          type: string
+          title: Url
+      type: object
+      required:
+      - description
+      - coefficient
+      - url
+      title: FeatureDoc
+      description: Documentation for a particular feature in the matching API model.
+    ConfigVar:
+      properties:
+        type:
+          $ref: '#/components/schemas/ConfigVarType'
+          default: float
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        default:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: number
+          - type: boolean
+          - type: 'null'
+          title: Default
+          default: 0
+      type: object
+      title: ConfigVar
+      description: A configuration variable for a scoring algorithm.
     AlgorithmDocs:
       properties:
         name:
@@ -185,74 +261,6 @@ components:
       - features
       title: AlgorithmDocs
       description: Documentation for a scoring algorithm.
-    ConfigVar:
-      properties:
-        type:
-          $ref: '#/components/schemas/ConfigVarType'
-          default: float
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        default:
-          anyOf:
-          - type: string
-          - type: integer
-          - type: number
-          - type: boolean
-          - type: 'null'
-          title: Default
-          default: 0
-      type: object
-      title: ConfigVar
-      description: A configuration variable for a scoring algorithm.
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    FeatureDoc:
-      properties:
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        coefficient:
-          type: number
-          title: Coefficient
-        url:
-          type: string
-          title: Url
-      type: object
-      required:
-      - description
-      - coefficient
-      - url
-      title: FeatureDoc
-      description: Documentation for a particular feature in the matching API model.
     HTTPValidationError:
       properties:
         detail:
@@ -262,6 +270,17 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
     Algorithm:
       properties:
         name:
@@ -287,22 +306,3 @@ components:
       - features
       - docs
       title: Algorithm
-    AlgorithmResponse:
-      properties:
-        algorithms:
-          items:
-            $ref: '#/components/schemas/Algorithm'
-          type: array
-          title: Algorithms
-        default:
-          type: string
-          title: Default
-        best:
-          type: string
-          title: Best
-      type: object
-      required:
-      - algorithms
-      - default
-      - best
-      title: AlgorithmResponse

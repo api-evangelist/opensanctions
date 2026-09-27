@@ -83,30 +83,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    FreebaseManifestExtendPropertySettingChoice:
-      properties:
-        id:
-          type: string
-          title: Id
-        name:
-          type: string
-          title: Name
-      type: object
-      required:
-      - id
-      - name
-      title: FreebaseManifestExtendPropertySettingChoice
-    ErrorResponse:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          examples:
-          - Detailed error message
-      type: object
-      required:
-      - detail
-      title: ErrorResponse
     FreebaseManifestSuggest:
       properties:
         entity:
@@ -121,23 +97,56 @@ components:
       - type
       - property
       title: FreebaseManifestSuggest
-    FreebaseManifestPreview:
+    FreebaseManifestExtendProposeProperties:
+      properties:
+        service_url:
+          type: string
+          minLength: 1
+          format: uri
+          title: Service Url
+        service_path:
+          type: string
+          title: Service Path
+      type: object
+      required:
+      - service_url
+      - service_path
+      title: FreebaseManifestExtendProposeProperties
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    FreebaseManifestView:
       properties:
         url:
           type: string
           title: Url
-        width:
-          type: integer
-          title: Width
-        height:
-          type: integer
-          title: Height
       type: object
       required:
       - url
-      - width
-      - height
-      title: FreebaseManifestPreview
+      title: FreebaseManifestView
     FreebaseManifest:
       properties:
         versions:
@@ -197,7 +206,7 @@ components:
       - extend
       - defaultTypes
       title: FreebaseManifest
-    FreebaseManifestExtendProposeProperties:
+    FreebaseManifestSuggestType:
       properties:
         service_url:
           type: string
@@ -211,42 +220,24 @@ components:
       required:
       - service_url
       - service_path
-      title: FreebaseManifestExtendProposeProperties
-    FreebaseManifestView:
+      title: FreebaseManifestSuggestType
+    FreebaseManifestPreview:
       properties:
         url:
           type: string
           title: Url
+        width:
+          type: integer
+          title: Width
+        height:
+          type: integer
+          title: Height
       type: object
       required:
       - url
-      title: FreebaseManifestView
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
+      - width
+      - height
+      title: FreebaseManifestPreview
     HTTPValidationError:
       properties:
         detail:
@@ -278,21 +269,44 @@ components:
       - id
       - name
       title: FreebaseType
-    FreebaseManifestSuggestType:
+    ErrorResponse:
       properties:
-        service_url:
+        detail:
           type: string
-          minLength: 1
-          format: uri
-          title: Service Url
-        service_path:
-          type: string
-          title: Service Path
+          title: Detail
+          examples:
+          - Detailed error message
       type: object
       required:
-      - service_url
-      - service_path
-      title: FreebaseManifestSuggestType
+      - detail
+      title: ErrorResponse
+    FreebaseManifestExtendPropertySettingChoice:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - id
+      - name
+      title: FreebaseManifestExtendPropertySettingChoice
+    FreebaseManifestExtend:
+      properties:
+        propose_properties:
+          $ref: '#/components/schemas/FreebaseManifestExtendProposeProperties'
+        propose_settings:
+          items:
+            $ref: '#/components/schemas/FreebaseManifestExtendPropertySetting'
+          type: array
+          title: Propose Settings
+      type: object
+      required:
+      - propose_properties
+      - propose_settings
+      title: FreebaseManifestExtend
     FreebaseManifestExtendPropertySetting:
       properties:
         name:
@@ -323,17 +337,3 @@ components:
       - default
       - help_text
       title: FreebaseManifestExtendPropertySetting
-    FreebaseManifestExtend:
-      properties:
-        propose_properties:
-          $ref: '#/components/schemas/FreebaseManifestExtendProposeProperties'
-        propose_settings:
-          items:
-            $ref: '#/components/schemas/FreebaseManifestExtendPropertySetting'
-          type: array
-          title: Propose Settings
-      type: object
-      required:
-      - propose_properties
-      - propose_settings
-      title: FreebaseManifestExtend
