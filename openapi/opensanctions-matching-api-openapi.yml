@@ -478,32 +478,148 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ValidationError:
+    EntityMatches:
       properties:
-        loc:
+        status:
+          type: integer
+          title: Status
+          default: 200
+          examples:
+          - 200
+        results:
           items:
-            anyOf:
-            - type: string
-            - type: integer
+            $ref: '#/components/schemas/ScoredEntityResponse'
           type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
+          title: Results
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        query:
+          $ref: '#/components/schemas/EntityExample'
       type: object
       required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
+      - results
+      - total
+      - query
+      title: EntityMatches
+    TotalSpec:
+      properties:
+        value:
+          type: integer
+          title: Value
+          examples:
+          - 42
+        relation:
+          type: string
+          title: Relation
+          default: eq
+          examples:
+          - eq
+      type: object
+      required:
+      - value
+      title: TotalSpec
+    SearchFacet:
+      properties:
+        label:
+          type: string
+          title: Label
+          examples:
+          - Countries
+        values:
+          items:
+            $ref: '#/components/schemas/SearchFacetItem'
+          type: array
+          title: Values
+      type: object
+      required:
+      - label
+      - values
+      title: SearchFacet
+    SearchResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            $ref: '#/components/schemas/EntityResponse'
+          type: array
+          title: Results
+        facets:
+          additionalProperties:
+            $ref: '#/components/schemas/SearchFacet'
+          type: object
+          title: Facets
+      type: object
+      required:
+      - limit
+      - total
+      - results
+      - facets
+      title: SearchResponse
+    Facet:
+      type: string
+      enum:
+      - datasets
+      - schema
+      - countries
+      - identifiers
+      - topics
+      - genders
+      title: Facet
+    EntityMatchResponse:
+      properties:
+        responses:
+          additionalProperties:
+            $ref: '#/components/schemas/EntityMatches'
+          type: object
+          title: Responses
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 5
+      type: object
+      required:
+      - responses
+      - limit
+      title: EntityMatchResponse
+    FeatureResult:
+      properties:
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+        score:
+          type: number
+          title: Score
+        query:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Query
+        candidate:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Candidate
+      type: object
+      required:
+      - detail
+      - score
+      title: FeatureResult
+      description: A explained score for a particular feature result.
     ScoredEntityResponse:
       properties:
         id:
@@ -588,6 +704,117 @@ components:
       - explanations
       - match
       title: ScoredEntityResponse
+    Operator:
+      type: string
+      enum:
+      - AND
+      - OR
+      title: Operator
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    EntityMatchQuery:
+      properties:
+        weights:
+          additionalProperties:
+            type: number
+          type: object
+          title: Weights
+          default: {}
+          examples:
+          - name_literal: 0.8
+        config:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: 'null'
+          type: object
+          title: Config
+          description: Algorithm-specific configuration parameters.
+          examples:
+          - nm_number_mismatch: 0.4
+        queries:
+          additionalProperties:
+            $ref: '#/components/schemas/EntityExample'
+          type: object
+          title: Queries
+      type: object
+      required:
+      - queries
+      title: EntityMatchQuery
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    SearchFacetItem:
+      properties:
+        name:
+          type: string
+          title: Name
+          examples:
+          - ru
+        label:
+          type: string
+          title: Label
+          examples:
+          - Russia
+        count:
+          type: integer
+          title: Count
+          default: 1
+          examples:
+          - 42
+      type: object
+      required:
+      - name
+      - label
+      title: SearchFacetItem
+    EntityExample:
+      properties:
+        id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Id
+          examples:
+          - my-entity-id
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - Person
+        properties:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - items: {}
+              type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+      type: object
+      required:
+      - schema
+      - properties
+      title: EntityExample
     EntityResponse:
       properties:
         id:
@@ -656,256 +883,29 @@ components:
       - schema
       - properties
       title: EntityResponse
-    TotalSpec:
+    ValidationError:
       properties:
-        value:
-          type: integer
-          title: Value
-          examples:
-          - 42
-        relation:
-          type: string
-          title: Relation
-          default: eq
-          examples:
-          - eq
-      type: object
-      required:
-      - value
-      title: TotalSpec
-    SearchFacet:
-      properties:
-        label:
-          type: string
-          title: Label
-          examples:
-          - Countries
-        values:
+        loc:
           items:
-            $ref: '#/components/schemas/SearchFacetItem'
-          type: array
-          title: Values
-      type: object
-      required:
-      - label
-      - values
-      title: SearchFacet
-    Operator:
-      type: string
-      enum:
-      - AND
-      - OR
-      title: Operator
-    EntityMatches:
-      properties:
-        status:
-          type: integer
-          title: Status
-          default: 200
-          examples:
-          - 200
-        results:
-          items:
-            $ref: '#/components/schemas/ScoredEntityResponse'
-          type: array
-          title: Results
-        total:
-          $ref: '#/components/schemas/TotalSpec'
-        query:
-          $ref: '#/components/schemas/EntityExample'
-      type: object
-      required:
-      - results
-      - total
-      - query
-      title: EntityMatches
-    Facet:
-      type: string
-      enum:
-      - datasets
-      - schema
-      - countries
-      - identifiers
-      - topics
-      - genders
-      title: Facet
-    EntityExample:
-      properties:
-        id:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Id
-          examples:
-          - my-entity-id
-        schema:
-          type: string
-          title: Schema
-          examples:
-          - Person
-        properties:
-          additionalProperties:
-            anyOf:
-            - type: string
-            - items: {}
-              type: array
-          type: object
-          title: Properties
-          examples:
-          - name:
-            - John Doe
-      type: object
-      required:
-      - schema
-      - properties
-      title: EntityExample
-    SearchResponse:
-      properties:
-        limit:
-          type: integer
-          title: Limit
-          examples:
-          - 20
-        offset:
-          type: integer
-          title: Offset
-          default: 0
-          examples:
-          - 0
-        total:
-          $ref: '#/components/schemas/TotalSpec'
-        results:
-          items:
-            $ref: '#/components/schemas/EntityResponse'
-          type: array
-          title: Results
-        facets:
-          additionalProperties:
-            $ref: '#/components/schemas/SearchFacet'
-          type: object
-          title: Facets
-      type: object
-      required:
-      - limit
-      - total
-      - results
-      - facets
-      title: SearchResponse
-    SearchFacetItem:
-      properties:
-        name:
-          type: string
-          title: Name
-          examples:
-          - ru
-        label:
-          type: string
-          title: Label
-          examples:
-          - Russia
-        count:
-          type: integer
-          title: Count
-          default: 1
-          examples:
-          - 42
-      type: object
-      required:
-      - name
-      - label
-      title: SearchFacetItem
-    EntityMatchResponse:
-      properties:
-        responses:
-          additionalProperties:
-            $ref: '#/components/schemas/EntityMatches'
-          type: object
-          title: Responses
-        limit:
-          type: integer
-          title: Limit
-          examples:
-          - 5
-      type: object
-      required:
-      - responses
-      - limit
-      title: EntityMatchResponse
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    FeatureResult:
-      properties:
-        detail:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Detail
-        score:
-          type: number
-          title: Score
-        query:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Query
-        candidate:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Candidate
-      type: object
-      required:
-      - detail
-      - score
-      title: FeatureResult
-      description: A explained score for a particular feature result.
-    EntityMatchQuery:
-      properties:
-        weights:
-          additionalProperties:
-            type: number
-          type: object
-          title: Weights
-          default: {}
-          examples:
-          - name_literal: 0.8
-        config:
-          additionalProperties:
             anyOf:
             - type: string
             - type: integer
-            - type: number
-            - type: boolean
-            - type: 'null'
-          type: object
-          title: Config
-          description: Algorithm-specific configuration parameters.
-          examples:
-          - nm_number_mismatch: 0.4
-        queries:
-          additionalProperties:
-            $ref: '#/components/schemas/EntityExample'
-          type: object
-          title: Queries
-      type: object
-      required:
-      - queries
-      title: EntityMatchQuery
-    ErrorResponse:
-      properties:
-        detail:
+          type: array
+          title: Location
+        msg:
           type: string
-          title: Detail
-          examples:
-          - Detailed error message
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
       required:
-      - detail
-      title: ErrorResponse
+      - loc
+      - msg
+      - type
+      title: ValidationError

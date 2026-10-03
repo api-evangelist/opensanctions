@@ -398,100 +398,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
-    EntityResponse:
-      properties:
-        id:
-          type: string
-          title: Id
-          examples:
-          - NK-A7z....
-        caption:
-          type: string
-          title: Caption
-          examples:
-          - John Doe
-        schema:
-          type: string
-          title: Schema
-          examples:
-          - LegalEntity
-        properties:
-          additionalProperties:
-            items:
-              anyOf:
-              - type: string
-              - $ref: '#/components/schemas/EntityResponse'
-            type: array
-          type: object
-          title: Properties
-          examples:
-          - name:
-            - John Doe
-        datasets:
-          items:
-            type: string
-          type: array
-          title: Datasets
-          default: []
-          examples:
-          - - us_ofac_sdn
-        referents:
-          items:
-            type: string
-          type: array
-          title: Referents
-          default: []
-          examples:
-          - - ofac-1234
-        target:
-          type: boolean
-          title: Target
-          default: false
-        first_seen:
-          title: First Seen
-          examples:
-          - '2026-01-01T12:00:00Z'
-        last_seen:
-          title: Last Seen
-          examples:
-          - '2026-01-01T12:00:00Z'
-        last_change:
-          title: Last Change
-          examples:
-          - '2026-01-01T12:00:00Z'
-      type: object
-      required:
-      - id
-      - caption
-      - schema
-      - properties
-      title: EntityResponse
     Statement:
       properties:
         id:
@@ -577,206 +483,23 @@ components:
       - first_seen
       - last_seen
       title: Statement
-    DataResource:
+    TotalSpec:
       properties:
-        name:
-          type: string
-          title: Name
-        url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Url
-        checksum:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Checksum
-        timestamp:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Timestamp
-        mime_type:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Mime Type
-        title:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Title
-        size:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          title: Size
-        mime_type_label:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Mime Type Label
-          readOnly: true
-      type: object
-      required:
-      - name
-      - mime_type_label
-      title: DataResource
-      description: A downloadable resource that is part of a dataset.
-    DataPublisher:
-      properties:
-        name:
-          type: string
-          title: Name
-        url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Url
-        name_en:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Name En
-        acronym:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Acronym
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        country:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Country
-        official:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Official
-          default: false
-        logo_url:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Logo Url
-        country_label:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Country Label
-          readOnly: true
-      type: object
-      required:
-      - name
-      - country_label
-      title: DataPublisher
-      description: Publisher information, eg. the government authority.
-    DataCoverage:
-      properties:
-        start:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Start
-        end:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: End
-        countries:
-          items:
-            type: string
-          type: array
-          title: Countries
-          default: []
-        frequency:
-          type: string
-          enum:
-          - unknown
-          - never
-          - hourly
-          - daily
-          - weekly
-          - monthly
-          - annually
-          title: Frequency
-          default: unknown
-        schedule:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Schedule
-      type: object
-      title: DataCoverage
-      description: Details on the temporal and geographic scope of a dataset.
-    DataCatalogModel:
-      properties:
-        datasets:
-          items:
-            $ref: '#/components/schemas/YenteDatasetModel'
-          type: array
-          title: Datasets
-        current:
-          items:
-            type: string
-          type: array
-          title: Current
-        outdated:
-          items:
-            type: string
-          type: array
-          title: Outdated
-        index_stale:
-          type: boolean
-          title: Index Stale
-          default: false
-      type: object
-      required:
-      - datasets
-      - current
-      - outdated
-      title: DataCatalogModel
-    StatementResponse:
-      properties:
-        limit:
+        value:
           type: integer
-          title: Limit
+          title: Value
           examples:
-          - 20
-        offset:
-          type: integer
-          title: Offset
-          default: 0
+          - 42
+        relation:
+          type: string
+          title: Relation
+          default: eq
           examples:
-          - 0
-        total:
-          $ref: '#/components/schemas/TotalSpec'
-        results:
-          items:
-            $ref: '#/components/schemas/Statement'
-          type: array
-          title: Results
+          - eq
       type: object
       required:
-      - limit
-      - total
-      - results
-      title: StatementResponse
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
+      - value
+      title: TotalSpec
     YenteDatasetModel:
       properties:
         name:
@@ -905,6 +628,217 @@ components:
       - title
       - index_current
       title: YenteDatasetModel
+    DataPublisher:
+      properties:
+        name:
+          type: string
+          title: Name
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        name_en:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name En
+        acronym:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Acronym
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        official:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Official
+          default: false
+        logo_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Logo Url
+        country_label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country Label
+          readOnly: true
+      type: object
+      required:
+      - name
+      - country_label
+      title: DataPublisher
+      description: Publisher information, eg. the government authority.
+    StatementResponse:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+          examples:
+          - 20
+        offset:
+          type: integer
+          title: Offset
+          default: 0
+          examples:
+          - 0
+        total:
+          $ref: '#/components/schemas/TotalSpec'
+        results:
+          items:
+            $ref: '#/components/schemas/Statement'
+          type: array
+          title: Results
+      type: object
+      required:
+      - limit
+      - total
+      - results
+      title: StatementResponse
+    DataCoverage:
+      properties:
+        start:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: End
+        countries:
+          items:
+            type: string
+          type: array
+          title: Countries
+          default: []
+        frequency:
+          type: string
+          enum:
+          - unknown
+          - never
+          - hourly
+          - daily
+          - weekly
+          - monthly
+          - annually
+          title: Frequency
+          default: unknown
+        schedule:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Schedule
+      type: object
+      title: DataCoverage
+      description: Details on the temporal and geographic scope of a dataset.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    DataResource:
+      properties:
+        name:
+          type: string
+          title: Name
+        url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Url
+        checksum:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Checksum
+        timestamp:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Timestamp
+        mime_type:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        size:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Size
+        mime_type_label:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Type Label
+          readOnly: true
+      type: object
+      required:
+      - name
+      - mime_type_label
+      title: DataResource
+      description: A downloadable resource that is part of a dataset.
+    DataCatalogModel:
+      properties:
+        datasets:
+          items:
+            $ref: '#/components/schemas/YenteDatasetModel'
+          type: array
+          title: Datasets
+        current:
+          items:
+            type: string
+          type: array
+          title: Current
+        outdated:
+          items:
+            type: string
+          type: array
+          title: Outdated
+        index_stale:
+          type: boolean
+          title: Index Stale
+          default: false
+      type: object
+      required:
+      - datasets
+      - current
+      - outdated
+      title: DataCatalogModel
     AdjacentResultsResponse:
       properties:
         limit:
@@ -944,34 +878,74 @@ components:
       - limit
       - total
       title: AdjacentResultsResponse
-    TotalSpec:
+    EntityResponse:
       properties:
-        value:
-          type: integer
-          title: Value
-          examples:
-          - 42
-        relation:
+        id:
           type: string
-          title: Relation
-          default: eq
+          title: Id
           examples:
-          - eq
+          - NK-A7z....
+        caption:
+          type: string
+          title: Caption
+          examples:
+          - John Doe
+        schema:
+          type: string
+          title: Schema
+          examples:
+          - LegalEntity
+        properties:
+          additionalProperties:
+            items:
+              anyOf:
+              - type: string
+              - $ref: '#/components/schemas/EntityResponse'
+            type: array
+          type: object
+          title: Properties
+          examples:
+          - name:
+            - John Doe
+        datasets:
+          items:
+            type: string
+          type: array
+          title: Datasets
+          default: []
+          examples:
+          - - us_ofac_sdn
+        referents:
+          items:
+            type: string
+          type: array
+          title: Referents
+          default: []
+          examples:
+          - - ofac-1234
+        target:
+          type: boolean
+          title: Target
+          default: false
+        first_seen:
+          title: First Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_seen:
+          title: Last Seen
+          examples:
+          - '2026-01-01T12:00:00Z'
+        last_change:
+          title: Last Change
+          examples:
+          - '2026-01-01T12:00:00Z'
       type: object
       required:
-      - value
-      title: TotalSpec
-    ErrorResponse:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          examples:
-          - Detailed error message
-      type: object
-      required:
-      - detail
-      title: ErrorResponse
+      - id
+      - caption
+      - schema
+      - properties
+      title: EntityResponse
     EntityAdjacentResponse:
       properties:
         entity:
@@ -986,3 +960,29 @@ components:
       - entity
       - adjacent
       title: EntityAdjacentResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

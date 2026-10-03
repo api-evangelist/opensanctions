@@ -130,41 +130,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    ConfigVarType:
-      type: string
-      enum:
-      - string
-      - integer
-      - float
-      - boolean
-      title: ConfigVarType
-      description: The type of a configuration variable.
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-            - type: string
-            - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
-      type: object
-      required:
-      - loc
-      - msg
-      - type
-      title: ValidationError
     AlgorithmResponse:
       properties:
         algorithms:
@@ -192,26 +157,15 @@ components:
           default: ok
       type: object
       title: StatusResponse
-    FeatureDoc:
-      properties:
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        coefficient:
-          type: number
-          title: Coefficient
-        url:
-          type: string
-          title: Url
-      type: object
-      required:
-      - description
-      - coefficient
-      - url
-      title: FeatureDoc
-      description: Documentation for a particular feature in the matching API model.
+    ConfigVarType:
+      type: string
+      enum:
+      - string
+      - integer
+      - float
+      - boolean
+      title: ConfigVarType
+      description: The type of a configuration variable.
     ConfigVar:
       properties:
         type:
@@ -234,6 +188,71 @@ components:
       type: object
       title: ConfigVar
       description: A configuration variable for a scoring algorithm.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+          title: Detail
+          examples:
+          - Detailed error message
+      type: object
+      required:
+      - detail
+      title: ErrorResponse
+    FeatureDoc:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        coefficient:
+          type: number
+          title: Coefficient
+        url:
+          type: string
+          title: Url
+      type: object
+      required:
+      - description
+      - coefficient
+      - url
+      title: FeatureDoc
+      description: Documentation for a particular feature in the matching API model.
+    Algorithm:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        features:
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureDoc'
+          type: object
+          title: Features
+          description: Deprecated, use `docs` instead
+          deprecated: true
+        docs:
+          $ref: '#/components/schemas/AlgorithmDocs'
+      type: object
+      required:
+      - name
+      - features
+      - docs
+      title: Algorithm
     AlgorithmDocs:
       properties:
         name:
@@ -261,48 +280,29 @@ components:
       - features
       title: AlgorithmDocs
       description: Documentation for a scoring algorithm.
-    HTTPValidationError:
+    ValidationError:
       properties:
-        detail:
+        loc:
           items:
-            $ref: '#/components/schemas/ValidationError'
+            anyOf:
+            - type: string
+            - type: integer
           type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    ErrorResponse:
-      properties:
-        detail:
+          title: Location
+        msg:
           type: string
-          title: Detail
-          examples:
-          - Detailed error message
-      type: object
-      required:
-      - detail
-      title: ErrorResponse
-    Algorithm:
-      properties:
-        name:
+          title: Message
+        type:
           type: string
-          title: Name
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        features:
-          additionalProperties:
-            $ref: '#/components/schemas/FeatureDoc'
+          title: Error Type
+        input:
+          title: Input
+        ctx:
           type: object
-          title: Features
-          description: Deprecated, use `docs` instead
-          deprecated: true
-        docs:
-          $ref: '#/components/schemas/AlgorithmDocs'
+          title: Context
       type: object
       required:
-      - name
-      - features
-      - docs
-      title: Algorithm
+      - loc
+      - msg
+      - type
+      title: ValidationError
