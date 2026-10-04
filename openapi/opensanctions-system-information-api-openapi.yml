@@ -130,33 +130,6 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    AlgorithmResponse:
-      properties:
-        algorithms:
-          items:
-            $ref: '#/components/schemas/Algorithm'
-          type: array
-          title: Algorithms
-        default:
-          type: string
-          title: Default
-        best:
-          type: string
-          title: Best
-      type: object
-      required:
-      - algorithms
-      - default
-      - best
-      title: AlgorithmResponse
-    StatusResponse:
-      properties:
-        status:
-          type: string
-          title: Status
-          default: ok
-      type: object
-      title: StatusResponse
     ConfigVarType:
       type: string
       enum:
@@ -166,6 +139,14 @@ components:
       - boolean
       title: ConfigVarType
       description: The type of a configuration variable.
+    StatusResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: StatusResponse
     ConfigVar:
       properties:
         type:
@@ -188,15 +169,25 @@ components:
       type: object
       title: ConfigVar
       description: A configuration variable for a scoring algorithm.
-    HTTPValidationError:
+    AlgorithmResponse:
       properties:
-        detail:
+        algorithms:
           items:
-            $ref: '#/components/schemas/ValidationError'
+            $ref: '#/components/schemas/Algorithm'
           type: array
-          title: Detail
+          title: Algorithms
+        default:
+          type: string
+          title: Default
+        best:
+          type: string
+          title: Best
       type: object
-      title: HTTPValidationError
+      required:
+      - algorithms
+      - default
+      - best
+      title: AlgorithmResponse
     ErrorResponse:
       properties:
         detail:
@@ -208,51 +199,6 @@ components:
       required:
       - detail
       title: ErrorResponse
-    FeatureDoc:
-      properties:
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        coefficient:
-          type: number
-          title: Coefficient
-        url:
-          type: string
-          title: Url
-      type: object
-      required:
-      - description
-      - coefficient
-      - url
-      title: FeatureDoc
-      description: Documentation for a particular feature in the matching API model.
-    Algorithm:
-      properties:
-        name:
-          type: string
-          title: Name
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        features:
-          additionalProperties:
-            $ref: '#/components/schemas/FeatureDoc'
-          type: object
-          title: Features
-          description: Deprecated, use `docs` instead
-          deprecated: true
-        docs:
-          $ref: '#/components/schemas/AlgorithmDocs'
-      type: object
-      required:
-      - name
-      - features
-      - docs
-      title: Algorithm
     AlgorithmDocs:
       properties:
         name:
@@ -306,3 +252,57 @@ components:
       - msg
       - type
       title: ValidationError
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    FeatureDoc:
+      properties:
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        coefficient:
+          type: number
+          title: Coefficient
+        url:
+          type: string
+          title: Url
+      type: object
+      required:
+      - description
+      - coefficient
+      - url
+      title: FeatureDoc
+      description: Documentation for a particular feature in the matching API model.
+    Algorithm:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        features:
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureDoc'
+          type: object
+          title: Features
+          description: Deprecated, use `docs` instead
+          deprecated: true
+        docs:
+          $ref: '#/components/schemas/AlgorithmDocs'
+      type: object
+      required:
+      - name
+      - features
+      - docs
+      title: Algorithm
