@@ -73,3 +73,36 @@ x-evidence:
     - {url: 'https://www.opensanctions.org/api/', status: 200}
     - {url: 'https://www.opensanctions.org/licensing/', status: 200}
     - {url: 'https://www.opensanctions.org/docs/api/faq/', status: 200}
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - hybrid
+  units: []
+  plans:
+  - name: Screening API (pay-as-you-go)
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - other
+    periods: []
+  - name: 30-day trial
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: Non-commercial / public-interest use
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: Bulk data licence / Reseller-OEM / On-premise
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
