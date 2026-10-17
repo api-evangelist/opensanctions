@@ -83,121 +83,28 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    FreebaseManifestExtend:
-      properties:
-        propose_properties:
-          $ref: '#/components/schemas/FreebaseManifestExtendProposeProperties'
-        propose_settings:
-          items:
-            $ref: '#/components/schemas/FreebaseManifestExtendPropertySetting'
-          type: array
-          title: Propose Settings
-      type: object
-      required:
-      - propose_properties
-      - propose_settings
-      title: FreebaseManifestExtend
-    FreebaseManifestExtendPropertySetting:
-      properties:
-        name:
-          type: string
-          title: Name
-        label:
-          type: string
-          title: Label
-        type:
-          type: string
-          title: Type
-        default:
-          title: Default
-        help_text:
-          type: string
-          title: Help Text
-        choices:
-          items:
-            $ref: '#/components/schemas/FreebaseManifestExtendPropertySettingChoice'
-          type: array
-          title: Choices
-          default: []
-      type: object
-      required:
-      - name
-      - label
-      - type
-      - default
-      - help_text
-      title: FreebaseManifestExtendPropertySetting
-    FreebaseManifestExtendProposeProperties:
-      properties:
-        service_url:
-          type: string
-          minLength: 1
-          format: uri
-          title: Service Url
-        service_path:
-          type: string
-          title: Service Path
-      type: object
-      required:
-      - service_url
-      - service_path
-      title: FreebaseManifestExtendProposeProperties
-    FreebaseManifestSuggestType:
-      properties:
-        service_url:
-          type: string
-          minLength: 1
-          format: uri
-          title: Service Url
-        service_path:
-          type: string
-          title: Service Path
-      type: object
-      required:
-      - service_url
-      - service_path
-      title: FreebaseManifestSuggestType
-    FreebaseManifestPreview:
-      properties:
-        url:
-          type: string
-          title: Url
-        width:
-          type: integer
-          title: Width
-        height:
-          type: integer
-          title: Height
-      type: object
-      required:
-      - url
-      - width
-      - height
-      title: FreebaseManifestPreview
-    FreebaseManifestExtendPropertySettingChoice:
+    FreebaseType:
       properties:
         id:
           type: string
           title: Id
+          examples:
+          - Person
         name:
           type: string
           title: Name
+          examples:
+          - People
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
       type: object
       required:
       - id
       - name
-      title: FreebaseManifestExtendPropertySettingChoice
-    ErrorResponse:
-      properties:
-        detail:
-          type: string
-          title: Detail
-          examples:
-          - Detailed error message
-      type: object
-      required:
-      - detail
-      title: ErrorResponse
+      title: FreebaseType
     FreebaseManifestView:
       properties:
         url:
@@ -233,51 +140,62 @@ components:
       - msg
       - type
       title: ValidationError
-    FreebaseType:
+    FreebaseManifestExtendPropertySetting:
       properties:
-        id:
-          type: string
-          title: Id
-          examples:
-          - Person
         name:
           type: string
           title: Name
-          examples:
-          - People
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-      type: object
-      required:
-      - id
-      - name
-      title: FreebaseType
-    FreebaseManifestSuggest:
-      properties:
-        entity:
-          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+        label:
+          type: string
+          title: Label
         type:
-          $ref: '#/components/schemas/FreebaseManifestSuggestType'
-        property:
-          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+          type: string
+          title: Type
+        default:
+          title: Default
+        help_text:
+          type: string
+          title: Help Text
+        choices:
+          items:
+            $ref: '#/components/schemas/FreebaseManifestExtendPropertySettingChoice'
+          type: array
+          title: Choices
+          default: []
       type: object
       required:
-      - entity
+      - name
+      - label
       - type
-      - property
-      title: FreebaseManifestSuggest
-    HTTPValidationError:
+      - default
+      - help_text
+      title: FreebaseManifestExtendPropertySetting
+    ErrorResponse:
       properties:
         detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
+          type: string
           title: Detail
+          examples:
+          - Detailed error message
       type: object
-      title: HTTPValidationError
+      required:
+      - detail
+      title: ErrorResponse
+    FreebaseManifestSuggestType:
+      properties:
+        service_url:
+          type: string
+          minLength: 1
+          format: uri
+          title: Service Url
+        service_path:
+          type: string
+          title: Service Path
+      type: object
+      required:
+      - service_url
+      - service_path
+      title: FreebaseManifestSuggestType
     FreebaseManifest:
       properties:
         versions:
@@ -337,3 +255,85 @@ components:
       - extend
       - defaultTypes
       title: FreebaseManifest
+    FreebaseManifestExtendPropertySettingChoice:
+      properties:
+        id:
+          type: string
+          title: Id
+        name:
+          type: string
+          title: Name
+      type: object
+      required:
+      - id
+      - name
+      title: FreebaseManifestExtendPropertySettingChoice
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    FreebaseManifestExtendProposeProperties:
+      properties:
+        service_url:
+          type: string
+          minLength: 1
+          format: uri
+          title: Service Url
+        service_path:
+          type: string
+          title: Service Path
+      type: object
+      required:
+      - service_url
+      - service_path
+      title: FreebaseManifestExtendProposeProperties
+    FreebaseManifestPreview:
+      properties:
+        url:
+          type: string
+          title: Url
+        width:
+          type: integer
+          title: Width
+        height:
+          type: integer
+          title: Height
+      type: object
+      required:
+      - url
+      - width
+      - height
+      title: FreebaseManifestPreview
+    FreebaseManifestExtend:
+      properties:
+        propose_properties:
+          $ref: '#/components/schemas/FreebaseManifestExtendProposeProperties'
+        propose_settings:
+          items:
+            $ref: '#/components/schemas/FreebaseManifestExtendPropertySetting'
+          type: array
+          title: Propose Settings
+      type: object
+      required:
+      - propose_properties
+      - propose_settings
+      title: FreebaseManifestExtend
+    FreebaseManifestSuggest:
+      properties:
+        entity:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+        type:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+        property:
+          $ref: '#/components/schemas/FreebaseManifestSuggestType'
+      type: object
+      required:
+      - entity
+      - type
+      - property
+      title: FreebaseManifestSuggest
