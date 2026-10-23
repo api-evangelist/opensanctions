@@ -986,3 +986,9 @@ components:
       - limit
       - total
       title: AdjacentResultsResponse
+x-provenance:
+  method: harvested
+  publisher: OpenSanctions
+  source: https://api.opensanctions.org/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
