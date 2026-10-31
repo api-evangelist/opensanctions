@@ -1,4 +1,4 @@
-# OpenSanctions (opensanctions)
+# OpenSanctions
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,28 +64,138 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Data on international sanctions, crime and politically exposed persons
+OpenSanctions is an open database of international sanctions, watchlists, criminal designations and politically exposed persons (PEPs), published as a screening API, bulk data downloads and MIT-licensed open-source software from Berlin. It consolidates hundreds of primary government sources — OFAC, the EU consolidated list, UN Security Council, UK FCDO, procurement debarment registers, regulatory enforcements and national PEP registers — into a single de-duplicated entity graph expressed in the FollowTheMoney ontology it stewards. The hosted Screening API at api.opensanctions.org offers query-by-example entity matching with scored, per-feature explanations, free-text search, entity fetch with relationship traversal, statement-level provenance for every asserted value, and an OpenRefine reconciliation manifest. It is used for customer due diligence, transaction monitoring, supply-chain and vessel screening, KYB, and investigative journalism. The dataset is free for non-commercial use under CC BY-NC 4.0; commercial use is licensed, and the API is metered at EUR 0.10 per query.
 
-**APIs.yml:** [apis.yml](apis.yml)
+**Areas:** Sanctions Screening · AML · Politically Exposed Persons · Compliance · Financial Crime · KYC · Entity Resolution · Open Data · Risk Data · Due Diligence · Public APIs · Agent-Native
 
-## Type
-- **x-type:** company
-- **x-tier:** 3 (bulk-registered from public-apis)
-- **source:** [public-apis/public-apis](https://github.com/public-apis/public-apis) — category: Open Data
+## OpenSanctions on APIs.io
 
-## API
-- **OpenSanctions** — [Documentation](https://www.opensanctions.org/docs/api/)
+Everything profiled for OpenSanctions is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/opensanctions/](https://apis.io/providers/opensanctions/)** — or go straight to one of the APIs or properties below.
 
-## Tags
-Open Data, Public APIs
+### APIs (4)
 
-## Notes
-This entry was bulk-registered as part of a public-apis catalog sweep on 2026-05-28.
-A real OpenAPI artifact will be added during a follow-up enrichment pass if the provider publishes one.
+- [OpenSanctions Data access API](https://apis.io/apis/opensanctions/opensanctions-data-access-api/) — Endpoints for fetching data from the API, either related to individual entities, or for bulk data access in various forms.
+- [OpenSanctions Matching API](https://apis.io/apis/opensanctions/opensanctions-matching-api/) — Endpoints for conducting a user-facing entity search or matching a local data store against the given dataset.
+- [OpenSanctions Reconciliation API](https://apis.io/apis/opensanctions/opensanctions-reconciliation-api/) — The Reconciliation Service provides four separate endpoints that work in concert to implement the data matching API used by OpenRefine, Wikidata and several…
+- [OpenSanctions System information API](https://apis.io/apis/opensanctions/opensanctions-system-information-api/) — Service metadata endpoints for health checking and getting the application metadata to be used in client applications.
 
-## Timestamps
-- **Created:** 2026-05-28
-- **Modified:** 2026-05-28
+### Published properties
 
-## Maintainers
-- **Kin Lane** — kin@apievangelist.com
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [yente](https://apis.io/servers/opensanctions/yente/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Opensanctions Agentic Access](https://apis.io/agentic-access/opensanctions/opensanctions-agentic-access/)
+
+#### Overlays (5)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Opensanctions Api Overlay](https://apis.io/overlays/opensanctions/opensanctions-api-overlay/)
+- [Opensanctions Data Access Api Phrasing Overlay](https://apis.io/overlays/opensanctions/opensanctions-data-access-api-phrasing-overlay/)
+- [Opensanctions Matching Api Phrasing Overlay](https://apis.io/overlays/opensanctions/opensanctions-matching-api-phrasing-overlay/)
+- [Opensanctions Reconciliation Api Phrasing Overlay](https://apis.io/overlays/opensanctions/opensanctions-reconciliation-api-phrasing-overlay/)
+- [Opensanctions System Information Api Phrasing Overlay](https://apis.io/overlays/opensanctions/opensanctions-system-information-api-phrasing-overlay/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Opensanctions Authentication](https://apis.io/security/opensanctions/opensanctions-authentication/)
+- [Opensanctions Domain Security](https://apis.io/security/opensanctions/opensanctions-domain-security/)
+- [Opensanctions Trust Center](https://apis.io/security/opensanctions/opensanctions-trust-center/)
+- [Opensanctions Vulnerability Disclosure](https://apis.io/security/opensanctions/opensanctions-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Opensanctions Plans Pricing](https://apis.io/plans/opensanctions/opensanctions-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Opensanctions Rate Limits](https://apis.io/rate-limits/opensanctions/opensanctions-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.opensanctions.org/)
+- [Documentation](https://www.opensanctions.org/docs/)
+- [Getting started](https://www.opensanctions.org/docs/api/quickstart/)
+- [API reference](https://www.opensanctions.org/reference/)
+- [Pricing](https://www.opensanctions.org/api/)
+- [Sign up](https://www.opensanctions.org/api/)
+- [Support](https://www.opensanctions.org/support/)
+- [Blog](https://www.opensanctions.org/articles/rss/)
+- [Security](https://www.opensanctions.org/docs/security/)
+- [Compliance](https://www.opensanctions.org/docs/security/)
+- [Terms of service](https://www.opensanctions.org/docs/terms/)
+- [Privacy policy](https://www.opensanctions.org/docs/privacy/)
+- [GitHub](https://github.com/opensanctions)
+- [Status](https://status.opensanctions.org/)
+
+## API Evangelist rating
+
+**Kin Score 67.9** — exemplar · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.3 |
+| Contract quality | 43.5 |
+| Contract governance | 18.2 |
+| Operational transparency | 76.3 |
+| Developer ergonomics | 80.4 |
+| Access clarity | 92.1 |
+
+**Agent readiness 33.7** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 35.3** — Government & Public Sector
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/opensanctions/](https://apis.io/providers/opensanctions/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for OpenSanctions: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/opensanctions/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
